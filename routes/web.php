@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GroupingController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GroupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,4 +19,7 @@ Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/create-groups', [GroupingController::class, 'createGroups']);
+Route::get('/login', [AuthController::class, 'index']);
+Route::get('/create-groups', [GroupController::class, 'createGroups'])->name('createGroups');
+Route::get('/admin/dashboard', [GroupController::class, 'adminDashboard'])->name('adminDashboard');
+Route::get('/user/dashboard', [GroupController::class, 'userDashboard'])->name('userDashboard');

@@ -160,7 +160,7 @@ def distribute_to_groups(members, features, n_groups=4, members_per_group=5):
         return None
 
 def main():
-    """Hàm chính để thực hiện chia nhóm"""
+    """Hàm chính để thực hiện chia nhóm và trả về kết quả cho Laravel"""
     try:
         # Lấy dữ liệu từ database
         members = fetch_members()
@@ -172,34 +172,48 @@ def main():
         if features is None:
             return json.dumps({"error": "Error preparing data"})
         
-        # Tạo nhóm với kích thước cố định
-        groups = distribute_to_groups(members, features)
-        if groups is None:
-            return json.dumps({"error": "Error creating groups"})
+        # Thực hiện clustering
+        kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+        clusters = kmeans.fit_predict(features)
         
-        # Tính toán và thêm thống kê cho mỗi nhóm
-        result = {}
+        # Tính điểm tương thích của mỗi member với mỗi nhóm
+        centers = kmeans.cluster_centers_
+        compatibility_scores = []
+        
+        for i, member in enumerate(members):
+            member_scores = []
+            for j in range(len(centers)):
+                # Tính khoảng cách đến center (càng gần càng tương thích)
+                distance = np.linalg.norm(features[i] - centers[j])
+                # Chuyển đổi khoảng cách thành điểm tương thích (0-100)
+                score = 100 * (1 - distance / np.max(np.linalg.norm(features - centers[j], axis=1)))
+                member_scores.append({
+                    'group_id': j + 1,
+                    'score': round(score, 2)
+                })
+            compatibility_scores.append({
+                'member_id': member['id'],
+                'scores': sorted(member_scores, key=lambda x: x['score'], reverse=True)
+            })
+        
+        # Tạo kết quả để trả về cho Laravel
+        result = {
+            'suggested_groups': {}, # Nhóm được đề xuất cho mỗi member
+            'compatibility_scores': compatibility_scores # Điểm tương thích với tất cả các nhóm
+        }
+        
+        # Phân phối members vào các nhóm theo thuật toán cân bằng
+        groups = distribute_to_groups(members, features)
         for group_id, group_members in groups.items():
-            group_stats = {
+            result['suggested_groups'][f'group_{group_id + 1}'] = {
                 'members': [
                     {
                         'id': str(member['id']),
-                        'name': member['name'],
-                        'gpa': str(member['gpa']),
-                        'last_gpa': str(member['last_gpa']),
-                        'final_score': str(member['final_score']),
-                        'personality': member['personality'],
-                        'hobby': member['hobby']
+                        'name': member['name']
                     }
                     for member in group_members
-                ],
-                'stats': {
-                    'avg_gpa': sum(float(m['gpa']) for m in group_members) / len(group_members),
-                    'avg_final_score': sum(float(m['final_score']) for m in group_members) / len(group_members),
-                    'hobbies': list(set(m['hobby'] for m in group_members))
-                }
+                ]
             }
-            result[f'group_{group_id + 1}'] = group_stats
         
         return json.dumps(result)
         
