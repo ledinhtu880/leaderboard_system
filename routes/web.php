@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +16,13 @@ use App\Http\Controllers\GroupController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'checklogin'])->name('checkLogin');
+Route::get('logout',  [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/login', [AuthController::class, 'index']);
-Route::get('/create-groups', [GroupController::class, 'createGroups'])->name('createGroups');
-Route::get('/admin/dashboard', [GroupController::class, 'adminDashboard'])->name('adminDashboard');
-Route::get('/user/dashboard', [GroupController::class, 'userDashboard'])->name('userDashboard');
+Route::middleware('checklogin')->group(function () {
+    Route::get('/', [HomeController::class, 'index']);
+    Route::get('/create-groups', [GroupController::class, 'createGroups'])->name('createGroups');
+    Route::get('/admin/dashboard', [GroupController::class, 'adminDashboard'])->name('adminDashboard');
+    Route::get('/user/dashboard', [GroupController::class, 'userDashboard'])->name('userDashboard');
+});

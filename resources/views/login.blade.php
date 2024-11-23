@@ -5,7 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: none;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
@@ -15,15 +33,19 @@
                 <div class="card shadow">
                     <div class="card-body p-5">
                         <h3 class="card-title text-center mb-4">Đăng nhập</h3>
-                        <form>
+                        <form id="loginForm" method="POST" action={{ route('checkLogin') }} novalidate>
+                            @csrf
                             <div class="mb-3">
                                 <label for="username" class="form-label">Tên đăng nhập</label>
-                                <input type="text" class="form-control" id="username"
+                                <input type="text" class="form-control" id="username" name="username"
                                     placeholder="Nhập tên đăng nhập">
+                                <div class="error-message" id="username-error"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mật khẩu</label>
-                                <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="Nhập mật khẩu">
+                                <div class="error-message" id="password-error"></div>
                             </div>
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="rememberMe">
@@ -40,6 +62,90 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            const message = '{{ session('message') }}';
+            const type = '{{ session('type') }}';
+
+            if (message && type) {
+                showToast(message, type);
+            }
+
+            // Regex patterns
+            const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+
+            $('#username').on('input', function() {
+                validateUsername();
+            });
+
+            $('#password').on('input', function() {
+                validatePassword();
+            });
+
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const isUsernameValid = validateUsername();
+                const isPasswordValid = validatePassword();
+
+                if (isUsernameValid && isPasswordValid) {
+                    this.submit();
+                }
+            });
+
+            function validateUsername() {
+                const username = $('#username').val();
+                const errorElement = $('#username-error');
+
+                if (!username) {
+                    showError(errorElement, 'Vui lòng nhập tên đăng nhập');
+                    return false;
+                }
+
+                if (!usernamePattern.test(username)) {
+                    showError(errorElement, 'Tên đăng nhập phải từ 6-20 ký tự và chỉ chứa chữ cái hoặc số');
+                    return false;
+                }
+
+                hideError(errorElement);
+                return true;
+            }
+
+            function validatePassword() {
+                const password = $('#password').val();
+                const errorElement = $('#password-error');
+
+                if (!password) {
+                    showError(errorElement, 'Vui lòng nhập mật khẩu');
+                    return false;
+                }
+
+                if (!passwordPattern.test(password)) {
+                    showError(errorElement, 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số');
+                    return false;
+                }
+
+                hideError(errorElement);
+                return true;
+            }
+
+            function showError(element, message) {
+                element.text(message).show();
+                element.prev('input').addClass('is-invalid');
+            }
+
+            function hideError(element) {
+                element.hide();
+                element.prev('input').removeClass('is-invalid');
+            }
+        });
+    </script>
 </body>
 
 </html>
