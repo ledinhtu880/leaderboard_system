@@ -63,39 +63,67 @@
             });
 
             function displayGroups(groups) {
-                let html = '';
+                let html = '<div class="row">';
 
                 for (let groupName in groups) {
-                    html += `
-                    <div class="col-md-3 mb-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>${groupName.replace('_', ' ').toUpperCase()}</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                `;
+                    const groupData = groups[groupName];
+                    const stats = groupData.stats;
 
-                    groups[groupName].forEach(member => {
+                    html += `
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">${groupName.replace('_', ' ').toUpperCase()}</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Group Statistics -->
+                        <div class="bg-light p-3 border-bottom">
+                            <h6 class="mb-2">Thống kê nhóm:</h6>
+                            <small>
+                                <div>GPA TB: ${stats.avg_gpa.toFixed(2)}</div>
+                                <div>Điểm TB: ${stats.avg_final_score.toFixed(2)}</div>
+                                <div>Sở thích: ${stats.hobbies.join(', ')}</div>
+                            </small>
+                        </div>
+                        
+                        <!-- Group Members -->
+                        <ul class="list-group list-group-flush">
+            `;
+
+                    groupData.members.forEach(member => {
                         html += `
-                        <li class="list-group-item">
-                            <strong>${member.name}</strong><br>
-                            GPA: ${member.gpa}<br>
-                            Final Score: ${member.final_score}<br>
-                            Personality: ${member.personality}
-                        </li>
-                    `;
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <strong>${member.name}</strong>
+                            <span class="badge bg-info">${member.personality}</span>
+                        </div>
+                        <div class="small">
+                            <div class="row">
+                                <div class="col-6">GPA: ${member.gpa}</div>
+                                <div class="col-6">Last: ${member.last_gpa}</div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-6">Final: ${member.final_score}</div>
+                                <div class="col-6">Hobby: ${member.hobby}</div>
+                            </div>
+                        </div>
+                    </li>
+                `;
                     });
 
                     html += `
-                                </ul>
-                            </div>
-                        </div>
+                        </ul>
                     </div>
-                `;
+                </div>
+            </div>
+            `;
                 }
 
+                html += '</div>';
                 $('#groupsContainer').html(html);
+
+                // Thêm tooltip cho các thẻ có class 'hobby'
+                $('[data-toggle="tooltip"]').tooltip();
             }
         });
     </script>

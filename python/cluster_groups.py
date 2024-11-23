@@ -3,13 +3,14 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import json
+from collections import defaultdict
 
 def connect_database():
     """Kết nối với MySQL database"""
     return mysql.connector.connect(
         host="localhost",
-        user="root",  # Thường mặc định là root
-        password="",  # Password trống
+        user="root",
+        password="",
         database="cluster"
     )
 
@@ -18,7 +19,7 @@ def fetch_members():
     try:
         conn = connect_database()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM member")
+        cursor.execute("SELECT * FROM members")
         members = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -27,60 +28,135 @@ def fetch_members():
         print(f"Error fetching data: {str(e)}")
         return []
 
+def encode_categorical(members, feature):
+    """Mã hóa dữ liệu categorical thành số"""
+    unique_values = list(set(str(m[feature]) for m in members))
+    value_to_num = {val: i/len(unique_values) for i, val in enumerate(unique_values)}
+    return [value_to_num[str(m[feature])] for m in members]
+
 def prepare_data(members):
-    """Chuẩn bị dữ liệu cho clustering"""
+    """Chuẩn bị dữ liệu cho clustering với trọng số"""
     try:
-        features = []
-        for member in members:
-            feature = [
-                float(member['gpa']),
-                float(member['last_gpa']),
-                float(member['final_score'])
-            ]
-            features.append(feature)
-        
-        if len(features) == 0:
+        if not members:
             return None
             
+        # Chuẩn hóa dữ liệu số
+        numeric_features = np.array([
+            [float(m['gpa']), float(m['last_gpa']), float(m['final_score'])]
+            for m in members
+        ])
         scaler = StandardScaler()
-        features_scaled = scaler.fit_transform(features)
-        return features_scaled
+        numeric_scaled = scaler.fit_transform(numeric_features)
+        
+        # Mã hóa dữ liệu categorical
+        personality_encoded = encode_categorical(members, 'personality')
+        hobby_encoded = encode_categorical(members, 'hobby')
+        
+        # Tính điểm tổng hợp với trọng số
+        weighted_features = []
+        for i in range(len(members)):
+            feature = np.array([
+                numeric_scaled[i][0] * 0.4,  # GPA (40%)
+                numeric_scaled[i][1] * 0.1,  # last_GPA (10%)
+                numeric_scaled[i][2] * 0.1,  # final_score (10%)
+                personality_encoded[i] * 0.2,  # personality (20%)
+                hobby_encoded[i] * 0.2  # hobby (20%)
+            ])
+            weighted_features.append(feature)
+        
+        return np.array(weighted_features)
     except Exception as e:
         print(f"Error preparing data: {str(e)}")
         return None
 
-def create_balanced_groups(members, features_scaled, n_groups=4):
-    """Tạo các nhóm cân bằng dựa trên clustering"""
+def distribute_to_groups(members, features, n_groups=4, members_per_group=5):
+    """Phân phối thành viên vào các nhóm có kích thước cố định với sự cân bằng về điểm số"""
     try:
-        n_members = len(members)
-        members_per_group = n_members // n_groups
+        # Tính điểm tổng hợp cho mỗi thành viên
+        member_scores = []
+        for i, member in enumerate(members):
+            score = float(member['gpa']) * 0.4 + \
+                    float(member['last_gpa']) * 0.1 + \
+                    float(member['final_score']) * 0.1
+            member_scores.append((i, score, member))
         
-        kmeans = KMeans(n_clusters=n_groups, random_state=42)
-        clusters = kmeans.fit_predict(features_scaled)
+        # Sắp xếp thành viên theo điểm số
+        member_scores.sort(key=lambda x: x[1], reverse=True)
         
-        cluster_members = {i: [] for i in range(n_groups)}
-        for i, cluster_id in enumerate(clusters):
-            cluster_members[cluster_id].append(members[i])
-        
+        # Khởi tạo các nhóm trống
         final_groups = {i: [] for i in range(n_groups)}
-        remaining_members = []
         
-        for cluster_id, cluster_list in cluster_members.items():
-            for member in cluster_list:
-                if len(final_groups[cluster_id]) < members_per_group:
-                    final_groups[cluster_id].append(member)
-                else:
-                    remaining_members.append(member)
+        # Phân phối thành viên theo pattern để đảm bảo cân bằng
+        # Pattern: Người giỏi nhất vào nhóm 1, giỏi thứ 2 vào nhóm 2,...
+        for i in range(len(member_scores)):
+            group_id = i % n_groups
+            if len(final_groups[group_id]) < members_per_group:
+                final_groups[group_id].append(member_scores[i][2])
         
-        for member in remaining_members:
-            for group_id in range(n_groups):
-                if len(final_groups[group_id]) < members_per_group:
-                    final_groups[group_id].append(member)
+        # Kiểm tra và đảm bảo mỗi nhóm có đúng số lượng thành viên
+        for group_id in final_groups:
+            if len(final_groups[group_id]) != members_per_group:
+                raise Exception(f"Group {group_id} does not have exactly {members_per_group} members")
+        
+        # Tối ưu hóa bằng cách hoán đổi các thành viên giữa các nhóm
+        max_iterations = 100
+        iteration = 0
+        
+        while iteration < max_iterations:
+            improved = False
+            
+            # Tính điểm trung bình của mỗi nhóm
+            group_avgs = {i: sum(float(m['gpa']) for m in group) / len(group) 
+                         for i, group in final_groups.items()}
+            
+            # Tìm nhóm có điểm cao nhất và thấp nhất
+            max_group = max(group_avgs.items(), key=lambda x: x[1])[0]
+            min_group = min(group_avgs.items(), key=lambda x: x[1])[0]
+            
+            # Nếu chênh lệch quá nhỏ, dừng tối ưu
+            if abs(group_avgs[max_group] - group_avgs[min_group]) < 0.1:
+                break
+            
+            # Thử hoán đổi thành viên
+            for i in range(members_per_group):
+                for j in range(members_per_group):
+                    # Tính điểm trung bình sau khi hoán đổi
+                    temp_max_group = list(final_groups[max_group])
+                    temp_min_group = list(final_groups[min_group])
+                    
+                    # Hoán đổi thử nghiệm
+                    temp_max_group[i], temp_min_group[j] = temp_min_group[j], temp_max_group[i]
+                    
+                    new_max_avg = sum(float(m['gpa']) for m in temp_max_group) / members_per_group
+                    new_min_avg = sum(float(m['gpa']) for m in temp_min_group) / members_per_group
+                    
+                    # Nếu hoán đổi cải thiện sự cân bằng
+                    current_diff = abs(group_avgs[max_group] - group_avgs[min_group])
+                    new_diff = abs(new_max_avg - new_min_avg)
+                    
+                    if new_diff < current_diff:
+                        # Thực hiện hoán đổi
+                        final_groups[max_group][i], final_groups[min_group][j] = \
+                            final_groups[min_group][j], final_groups[max_group][i]
+                        improved = True
+                        break
+                if improved:
                     break
+            
+            if not improved:
+                break
+                
+            iteration += 1
+
+        # Kiểm tra lại lần cuối
+        for group_id, group in final_groups.items():
+            if len(group) != members_per_group:
+                raise Exception(f"Final group {group_id} does not have exactly {members_per_group} members")
         
         return final_groups
+        
     except Exception as e:
-        print(f"Error creating groups: {str(e)}")
+        print(f"Error distributing groups: {str(e)}")
         return None
 
 def main():
@@ -91,37 +167,44 @@ def main():
         if not members:
             return json.dumps({"error": "No members found"})
         
-        # Chuẩn bị dữ liệu
-        features_scaled = prepare_data(members)
-        if features_scaled is None:
+        # Chuẩn bị dữ liệu với trọng số
+        features = prepare_data(members)
+        if features is None:
             return json.dumps({"error": "Error preparing data"})
         
-        # Tạo nhóm
-        groups = create_balanced_groups(members, features_scaled)
+        # Tạo nhóm với kích thước cố định
+        groups = distribute_to_groups(members, features)
         if groups is None:
             return json.dumps({"error": "Error creating groups"})
         
-        # Chuyển đổi decimal và datetime objects thành string để có thể serialize
+        # Tính toán và thêm thống kê cho mỗi nhóm
         result = {}
         for group_id, group_members in groups.items():
-            result[f'group_{group_id + 1}'] = [
-                {
-                    'id': str(member['id']),
-                    'name': member['name'],
-                    'gpa': str(member['gpa']),
-                    'last_gpa': str(member['last_gpa']),
-                    'final_score': str(member['final_score']),
-                    'personality': member['personality'],
-                    'hobby': member['hobby']
+            group_stats = {
+                'members': [
+                    {
+                        'id': str(member['id']),
+                        'name': member['name'],
+                        'gpa': str(member['gpa']),
+                        'last_gpa': str(member['last_gpa']),
+                        'final_score': str(member['final_score']),
+                        'personality': member['personality'],
+                        'hobby': member['hobby']
+                    }
+                    for member in group_members
+                ],
+                'stats': {
+                    'avg_gpa': sum(float(m['gpa']) for m in group_members) / len(group_members),
+                    'avg_final_score': sum(float(m['final_score']) for m in group_members) / len(group_members),
+                    'hobbies': list(set(m['hobby'] for m in group_members))
                 }
-                for member in group_members
-            ]
+            }
+            result[f'group_{group_id + 1}'] = group_stats
         
-        # Trả về JSON string
         return json.dumps(result)
         
     except Exception as e:
         return json.dumps({"error": f"General error: {str(e)}"})
 
 if __name__ == "__main__":
-    print(main())  # In ra để PHP có thể capture output
+    print(main())
