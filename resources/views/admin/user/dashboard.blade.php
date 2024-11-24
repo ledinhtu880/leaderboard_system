@@ -132,20 +132,38 @@
             }
 
             function updateStats(api) {
-                const filteredData = api.rows({
-                    search: 'applied'
-                }).data().toArray();
+                let filteredData;
+
+                // Kiểm tra xem có tìm kiếm hay không
+                if (api.search() !== '') {
+                    filteredData = api.rows({
+                        search: 'applied'
+                    }).data().toArray();
+                } else {
+                    filteredData = api.rows({
+                        page: 'current'
+                    }).data().toArray();
+
+                }
 
                 $('#avgGPA').text(calculateAverage(filteredData, 1));
                 $('#avgFinalScore').text(calculateAverage(filteredData, 3));
                 $('#totalMembers').text(filteredData.length);
 
+                // Cập nhật hiển thị số lượng thành viên sau khi thay đổi
                 $('.stats-card').each(function() {
                     $(this).addClass('border-primary');
                     setTimeout(() => {
                         $(this).removeClass('border-primary');
                     }, 500);
                 });
+
+                // Kiểm tra và ẩn/hiện phân trang
+                if (filteredData.length <= api.page.len()) {
+                    $('.dataTables_paginate').hide();
+                } else {
+                    $('.dataTables_paginate').show();
+                }
             }
 
             const table = $('#membersTable').DataTable({
@@ -192,7 +210,7 @@
             });
 
             table.on('length.dt', function() {
-                updateStats(table);
+                updateStats(table); // Gọi updateStats khi thay đổi số lượng hiển thị
             });
 
             table.on('page.dt', function() {
