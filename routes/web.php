@@ -18,12 +18,12 @@ use App\Http\Controllers\HomeController;
 
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'checklogin'])->name('checkLogin');
-Route::get('logout',  [AuthController::class, 'logout'])->name('logout');
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('checklogin')->group(function () {
-    Route::get('', [HomeController::class, 'index']);
+    Route::get('', [HomeController::class, 'index'])->name('home');
     Route::get('cluster/', [GroupController::class, 'clusterView'])->name('clusterView');
     Route::get('run_cluster', [GroupController::class, 'runCluster'])->name('run_cluster');
     Route::get('admin/groups/', [GroupController::class, 'groupDashboard'])->name('groupDashboard');
-    Route::get('user/dashboard', [GroupController::class, 'userDashboard'])->name('userDashboard');
+    Route::get('admin/users/', [GroupController::class, 'userDashboard'])->name('userDashboard');
 });

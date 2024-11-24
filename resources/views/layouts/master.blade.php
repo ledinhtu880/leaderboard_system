@@ -45,6 +45,10 @@
             if (message && type) {
                 showToast(message, type);
             }
+
+            $('#logout-btn').click(function() {
+                $('#logout-form').submit();
+            });
         })
     </script>
 

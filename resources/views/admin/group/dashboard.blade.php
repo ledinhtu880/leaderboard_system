@@ -4,14 +4,6 @@
 
 @push('css')
     <style>
-        .border-start-3 {
-            border-left-width: 3px !important;
-        }
-
-        .card {
-            transition: transform 0.2s;
-        }
-
         .member-drag-handle {
             cursor: grab;
             padding: 0.5rem;
@@ -51,10 +43,6 @@
 
         .border-start-3 {
             border-left-width: 3px !important;
-        }
-
-        .card {
-            transition: transform 0.2s;
         }
 
         .member-drag-handle {
@@ -169,19 +157,19 @@
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex justify-content-between">
-                                                    <span class="text-muted">Last:</span>
+                                                    <span class="text-muted">Điểm QTHT:</span>
                                                     <span class="fw-semibold">{{ $member['last_gpa'] ?? 'N/A' }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex justify-content-between">
-                                                    <span class="text-muted">Final:</span>
+                                                    <span class="text-muted">GPA ky gần nhất:</span>
                                                     <span class="fw-semibold">{{ $member['final_score'] ?? 'N/A' }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex justify-content-between">
-                                                    <span class="text-muted">Hobby:</span>
+                                                    <span class="text-muted">Sở thích:</span>
                                                     <span class="fw-semibold">{{ $member['hobby'] ?? 'N/A' }}</span>
                                                 </div>
                                             </div>
@@ -202,7 +190,7 @@
     <script>
         $(document).ready(function() {
             let hasChanges = false;
-            const $saveButton = $('#saveChanges');
+            const btnSave = $('#saveChanges');
 
             // Initialize Sortable on each list
             $('.member-list').each(function() {
@@ -226,7 +214,7 @@
                         checkMemberCount($toGroup);
 
                         hasChanges = true;
-                        $saveButton.prop('disabled', false);
+                        btnSave.prop('disabled', false);
                     }
                 });
             });
@@ -290,7 +278,7 @@
             }
 
             // Save Changes Handler
-            $saveButton.on('click', function() {
+            btnSave.on('click', function() {
                 if (!hasChanges) return;
 
                 const groupData = {};
@@ -313,7 +301,7 @@
                     success: function(response) {
                         showToast(response.message, response.status);
                         hasChanges = false;
-                        $saveButton.prop('disabled', true);
+                        btnSave.prop('disabled', true);
                     },
                     error: function(xhr, status, error) {
                         showToast('Đã xảy ra lỗi khi lưu thay đổi. Vui lòng thử lại!',

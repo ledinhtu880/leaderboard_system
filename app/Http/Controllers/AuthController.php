@@ -36,7 +36,7 @@ class AuthController extends Controller
                 ->with('type', 'success')
                 ->with('message', 'Đăng nhập thành công');
         } else {
-            return redirect()->back()->with('type', 'warning')->with('message', 'Tên đăng nhập hoặc mật khẩu không chính xác');
+            return redirect()->back()->withInput()->with('type', 'warning')->with('message', 'Tên đăng nhập hoặc mật khẩu không chính xác');
         }
     }
     public function logout()

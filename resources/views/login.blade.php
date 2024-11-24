@@ -39,7 +39,7 @@
                             <div class="mb-3">
                                 <label for="username" class="form-label">Tên đăng nhập</label>
                                 <input type="text" class="form-control" id="username" name="username"
-                                    placeholder="Nhập tên đăng nhập">
+                                    placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
                                 <div class="error-message" id="username-error"></div>
                             </div>
                             <div class="mb-3">
@@ -78,7 +78,7 @@
             }
 
             const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
-            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
 
             $('#username').on('input', function() {
                 hideError($(this).next());

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Đặt múi giờ cho toàn bộ ứng dụng
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        // Hoặc, nếu bạn đang sử dụng Carbon (Carbon được Laravel sử dụng cho ngày giờ)
+        Carbon::setLocale('vi');
     }
 }

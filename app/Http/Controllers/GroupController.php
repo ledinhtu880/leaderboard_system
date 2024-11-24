@@ -125,7 +125,8 @@ class GroupController extends Controller
                     ->whereIn('member_id', $memberIds)
                     ->update([
                         'group_id' => $groupId,
-                        'updated_at' => now()
+                        'updated_at' => now(),
+                        'status' => 'confirmed'
                     ]);
             }
 

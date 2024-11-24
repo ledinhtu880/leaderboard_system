@@ -46,7 +46,6 @@
                         </a>
                     </div>
                 </div>
-                {{-- Xem thành viên nào thuộc nhóm nào, người dùng đăng nhập thì sẽ xem mình được gợi ý ở nhóm nào --}}
             </div>
         @else
             Người dùng

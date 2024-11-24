@@ -4,19 +4,15 @@
 
 @section('content')
     <div class="container">
-        <h2>Phân chia nhóm</h2>
-
-        <button id="createGroupsBtn" class="btn btn-primary">
-            Tạo nhóm
-        </button>
-
-        <div id="loadingSpinner" style="display: none;">
-            Đang xử lý...
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Phân chia nhóm</h2>
+            <button class="btn btn-dark" id="createGroupsBtn">
+                <i class="fas fa-plus me-2"></i>Chạy thuật toán
+            </button>
         </div>
 
         <div id="groupsResult" class="mt-4">
             <div class="row" id="groupsContainer">
-                <!-- Kết quả sẽ được hiển thị ở đây -->
             </div>
         </div>
     </div>
@@ -33,32 +29,29 @@
 
             $('#createGroupsBtn').click(function() {
                 $("#cover-spin").show();
-                $('#loadingSpinner').show();
                 $('#groupsContainer').empty();
 
                 $.ajax({
                     url: '/run_cluster',
                     method: 'GET',
                     success: function(response) {
-                        $('#loadingSpinner').hide();
+                        $("#cover-spin").hide();
                         if (response.error) {
                             alert('Lỗi: ' + response.error);
                             return;
                         }
+                        showToast("Phân nhóm thành công", "success");
                         displayGroups(response);
+                        $("#createGroupsBtn").prop('disabled', true);
                     },
                     error: function(xhr) {
-                        $('#loadingSpinner').hide();
+                        $("#cover-spin").hide();
                         let errorMessage = 'Có lỗi xảy ra khi tạo nhóm';
                         if (xhr.responseJSON && xhr.responseJSON.error) {
                             errorMessage += ': ' + xhr.responseJSON.error;
                         }
                         alert(errorMessage);
                     },
-                    complete: function() {
-                        $("#cover-spin").hide();
-                        showToast("Phân nhóm thành công", "success");
-                    }
                 });
             });
 
@@ -85,10 +78,10 @@
                                         <div class="bg-light p-3 border-bottom">
                                             <h6 class="mb-2">Thống kê nhóm:</h6>
                                             <small>
-                                                <div><i class="fas fa-chart-line"></i> GPA TB: ${stats.avg_gpa}</div>
-                                                <div><i class="fas fa-star"></i> Điểm TB: ${stats.avg_final_score}</div>
+                                                <div><i class="fas fa-chart-line text-info"></i> GPA TB: ${stats.avg_gpa}</div>
+                                                <div><i class="fas fa-star text-warning"></i> Điểm TB: ${stats.avg_final_score}</div>
                                                 <div class="text-truncate">
-                                                    <i class="fas fa-heart"></i> Sở thích: ${stats.hobbies.join(', ') || 'Chưa có'}
+                                                    <i class="fas fa-heart text-danger"></i> Sở thích: ${stats.hobbies.join(', ') || 'Chưa có'}
                                                 </div>
                                             </small>
                                         </div>
@@ -123,18 +116,18 @@
                                     <div class="small">
                                         <div class="row">
                                             <div class="col-6" title="GPA Hiện tại">
-                                                <i class="fas fa-graduation-cap"></i> GPA: ${gpa}
+                                                <i class="fas fa-graduation-cap text-primary"></i> GPA: ${gpa}
                                             </div>
                                             <div class="col-6" title="GPA Kỳ trước">
-                                                <i class="fas fa-history"></i> Last: ${lastGpa}
+                                                <i class="fas fa-history text-info"></i> Last: ${lastGpa}
                                             </div>
                                         </div>
                                         <div class="row mt-1">
                                             <div class="col-6" title="Điểm tổng kết">
-                                                <i class="fas fa-star"></i> Final: ${finalScore}
+                                                <i class="fas fa-star text-warning"></i> Final: ${finalScore}
                                             </div>
                                             <div class="col-6 text-truncate" title="${hobby}">
-                                                <i class="fas fa-heart"></i> ${hobby}
+                                                <i class="fas fa-heart text-danger"></i> ${hobby}
                                             </div>
                                         </div>
                                     </div>

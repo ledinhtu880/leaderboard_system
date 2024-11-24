@@ -1,42 +1,47 @@
-<header class="header-container">
-    <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-between">
-            <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
-                <h5 class="brand-title">Cụm 2</h5>
+<header>
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Hệ thống chia nhóm
             </a>
-            <div class="dropdown text-end">
-                <a href="#" class="text-decoration-none dropdown-toggle user-dropdown" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    <div class="d-flex align-items-center">
-                        <span class="account-avatar rounded-circle">
-                            {{ session('firstCharacter') }}
-                        </span>
-                        <div class="d-flex flex-column ms-2 text-start">
-                            <span class="account-name">
-                                {{ session('name') }}
-                            </span>
-                            <span class="account-role">
-                                {{ session('role') }}
-                            </span>
-                        </div>
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end text-small">
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-person me-2"></i>Tài khoản
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li
+                        class="nav-item {{ Str::startsWith(request()->url(), url('/admin/groups/')) ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('groupDashboard') }}">
+                            <i class="fas fa-users me-1"></i>Danh sách nhóm
                         </a>
                     </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('logout') }}">
-                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                    <li class="nav-item {{ Str::startsWith(request()->url(), url('/admin/users/')) ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('userDashboard') }}">
+                            <i class="fas fa-users me-1"></i>Danh sách thành viên
                         </a>
                     </li>
                 </ul>
+                <div class="user-menu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar">
+                        {{ session('firstCharacter') }}
+                    </div>
+                    <div class="user-info">
+                        <p class="user-name">{{ session('name') }}</p>
+                        <p class="user-role">{{ ucfirst(session('role')) }}</p>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" id="logout-btn" class="dropdown-item">
+                                    Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
+    </nav>
 </header>

@@ -1,72 +1,69 @@
-.header-container {
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    padding-top: 12px;
+.custom-navbar {
+    background: #2c3e50;
+    padding: 12px 0;
 }
-
-.brand-title {
-    color: #0071c6;
+.navbar-brand {
+    color: white !important;
     font-weight: 600;
-    font-size: 1.5rem;
-    margin: 0;
-    transition: color 0.3s ease;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
 }
-
-.brand-title:hover {
-    color: #005aa1;
-}
-
-.account-avatar {
+.navbar-logo {
     width: 40px;
     height: 40px;
-    background-color: #0071c6;
-    color: white;
+    margin-right: 10px;
+    background: white;
+    border-radius: 8px;
+    padding: 5px;
+}
+.nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin: 0 15px;
+    transition: color 0.3s;
+}
+.nav-link:hover {
+    color: white !important;
+}
+.active .nav-link {
+    color: white !important;
+    border-bottom: 2px solid #3498db;
+}
+
+/* User Menu Styling */
+.user-menu {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    padding-left: 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #3498db;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
-    font-size: 1.2rem;
+    color: white;
+    font-weight: 600;
+    margin-right: 10px;
 }
-
-.account-name {
-    color: #333;
-    font-weight: 500;
-    font-size: 0.95rem;
+.user-info {
+    color: white;
+    margin-right: 15px;
 }
-
-.account-role {
-    color: #666;
-    font-size: 0.8rem;
-}
-
-.dropdown-toggle::after {
-    margin-left: 0.5rem;
-    vertical-align: middle;
-    display: inline;
-}
-
-.dropdown-menu {
-    margin-top: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.dropdown-item {
-    padding: 0.7rem 1.2rem;
+.user-name {
     font-size: 0.9rem;
+    margin: 0;
 }
-
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #0071c6;
-}
-
-.dropdown-divider {
-    margin: 0.5rem 0;
-}
-
-.user-dropdown:hover {
-    background-color: #f8f9fa;
+.user-role {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin: 0;
 }
 
 .menu-container {
