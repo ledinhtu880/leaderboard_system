@@ -183,9 +183,7 @@ def main():
         for i, member in enumerate(members):
             member_scores = []
             for j in range(len(centers)):
-                # Tính khoảng cách đến center (càng gần càng tương thích)
                 distance = np.linalg.norm(features[i] - centers[j])
-                # Chuyển đổi khoảng cách thành điểm tương thích (0-100)
                 score = 100 * (1 - distance / np.max(np.linalg.norm(features - centers[j], axis=1)))
                 member_scores.append({
                     'group_id': j + 1,
@@ -196,23 +194,66 @@ def main():
                 'scores': sorted(member_scores, key=lambda x: x['score'], reverse=True)
             })
         
-        # Tạo kết quả để trả về cho Laravel
-        result = {
-            'suggested_groups': {}, # Nhóm được đề xuất cho mỗi member
-            'compatibility_scores': compatibility_scores # Điểm tương thích với tất cả các nhóm
-        }
-        
         # Phân phối members vào các nhóm theo thuật toán cân bằng
         groups = distribute_to_groups(members, features)
+        
+        # Tạo kết quả với thông tin chi tiết cho mỗi nhóm
+        result = {
+            'suggested_groups': {},
+            'compatibility_scores': compatibility_scores
+        }
+        
+        # Hàm helper để chuyển đổi Decimal sang float
+        def decimal_to_float(value):
+            try:
+                if hasattr(value, 'to_eng_string'):  # Kiểm tra nếu là Decimal
+                    return float(value.to_eng_string())
+                return float(value)
+            except (TypeError, ValueError):
+                return 'N/A'
+
+        # Tính toán thống kê cho mỗi nhóm
         for group_id, group_members in groups.items():
+            # Tính các giá trị trung bình
+            valid_gpas = [decimal_to_float(m.get('gpa')) for m in group_members if m.get('gpa') != 'N/A']
+            valid_final_scores = [decimal_to_float(m.get('final_score')) for m in group_members if m.get('final_score') != 'N/A']
+            
+            avg_gpa = sum(valid_gpas) / len(valid_gpas) if valid_gpas else 0
+            avg_final_score = sum(valid_final_scores) / len(valid_final_scores) if valid_final_scores else 0
+            
+            # Tập hợp sở thích của nhóm
+            all_hobbies = []
+            for member in group_members:
+                if isinstance(member.get('hobby'), str):
+                    hobbies = [h.strip() for h in member['hobby'].split(',')]
+                    all_hobbies.extend(hobbies)
+            
+            # Lấy các sở thích phổ biến nhất
+            hobby_counts = {}
+            for hobby in all_hobbies:
+                hobby_counts[hobby] = hobby_counts.get(hobby, 0) + 1
+            common_hobbies = sorted(hobby_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+            common_hobbies = [h[0] for h in common_hobbies]
+            
+            # Tạo thông tin chi tiết cho nhóm
             result['suggested_groups'][f'group_{group_id + 1}'] = {
                 'members': [
                     {
                         'id': str(member['id']),
-                        'name': member['name']
+                        'name': member['name'],
+                        'personality': str(member.get('personality', 'N/A')),
+                        'gpa': decimal_to_float(member.get('gpa')),
+                        'last_gpa': decimal_to_float(member.get('last_gpa')),
+                        'final_score': decimal_to_float(member.get('final_score')),
+                        'hobby': str(member.get('hobby', 'N/A'))
                     }
                     for member in group_members
-                ]
+                ],
+                'stats': {
+                    'avg_gpa': round(avg_gpa, 2),
+                    'avg_final_score': round(avg_final_score, 2),
+                    'hobbies': common_hobbies
+                }
             }
         
         return json.dumps(result)

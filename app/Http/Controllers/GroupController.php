@@ -10,7 +10,11 @@ use App\Models\Member;
 
 class GroupController extends Controller
 {
-    public function createGroups()
+    public function clusterView()
+    {
+        return view('admin.cluster');
+    }
+    public function runCluster()
     {
         // Gọi Python script và nhận kết quả
         $pythonScript = base_path('python/cluster_groups.py');
@@ -46,7 +50,7 @@ class GroupController extends Controller
             }
         });
 
-        return response()->json(['message' => 'Clustering completed successfully']);
+        return response()->json($result);
     }
 
     public function adminDashboard()
@@ -55,7 +59,7 @@ class GroupController extends Controller
             $query->with('user')->orderBy('compatibility_score', 'desc');
         }])->get();
 
-        return view('admin.groups.index', compact('groups'));
+        return view('admin.index', compact('groups'));
     }
 
     public function userDashboard()

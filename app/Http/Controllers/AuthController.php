@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
@@ -27,9 +27,11 @@ class AuthController extends Controller
             $name = $user->member->name;
             $username = $user->username;
             $role = $user->role;
+            $firstCharacter = $user->member->getFirstCharacter;
             $request->session()->put('name', $name);
             $request->session()->put('username', $username);
             $request->session()->put('role', $role);
+            $request->session()->put('firstCharacter', $firstCharacter);
             return redirect()->intended('')
                 ->with('type', 'success')
                 ->with('message', 'Đăng nhập thành công');

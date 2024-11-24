@@ -1,39 +1,36 @@
-<!DOCTYPE html>
-<html>
+@extends('layouts.master')
 
-<head>
-    <title>Phân chia nhóm</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
+@section('title', 'Phân chia nhóm')
 
-<body>
-    <a href="{{ route('createGroups') }}" class="btn btn-info">Tao group</a>
-    <a href="{{ route('adminDashboard') }}" class="btn btn-info">Admin</a>
-    <a href="{{ route('userDashboard') }}" class="btn btn-info">User</a>
-    <a href="{{ route('logout') }}" class="btn btn-info">Đăng xuất</a>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="{{ asset('js/toast.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            const message = '{{ session('message') }}';
-            const type = '{{ session('type') }}';
-
-            if (message && type) {
-                showToast(message, type);
-            }
-        });
-    </script>
-</body>
-
-</html>
+@section('content')
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="menu-item rounded shadow">
+                    <a href="{{ route('clusterView') }}" class="menu-link">
+                        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span class="menu-text">Phân chia nhóm</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="menu-item rounded shadow">
+                    <a href="#" class="menu-link">
+                        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                            </path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                            <line x1="12" y1="11" x2="12" y2="17"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                        </svg>
+                        <span class="menu-text">Xem danh sách nhóm</span>
+                    </a>
+                </div>
+            </div>
+            {{-- Xem thành viên nào thuộc nhóm nào, người dùng đăng nhập thì sẽ xem mình được gợi ý ở nhóm nào --}}
+        </div>
+    </div>
+@endsection
