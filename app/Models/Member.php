@@ -26,6 +26,11 @@ class Member extends Model
         'final_score' => 'float',
     ];
 
+    public function groupMemberships()
+    {
+        return $this->hasMany(GroupMember::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

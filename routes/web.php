@@ -24,6 +24,6 @@ Route::middleware('checklogin')->group(function () {
     Route::get('', [HomeController::class, 'index']);
     Route::get('cluster/', [GroupController::class, 'clusterView'])->name('clusterView');
     Route::get('run_cluster', [GroupController::class, 'runCluster'])->name('run_cluster');
-    Route::get('admin/dashboard', [GroupController::class, 'adminDashboard'])->name('adminDashboard');
+    Route::get('admin/groups/', [GroupController::class, 'groupDashboard'])->name('groupDashboard');
     Route::get('user/dashboard', [GroupController::class, 'userDashboard'])->name('userDashboard');
 });

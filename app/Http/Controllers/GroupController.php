@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Group;
 use App\Models\GroupMember;
@@ -52,31 +54,92 @@ class GroupController extends Controller
 
         return response()->json($result);
     }
-
-    public function adminDashboard()
+    public function groupDashboard()
     {
-        $groups = Group::with(['members' => function ($query) {
-            $query->with('user')->orderBy('compatibility_score', 'desc');
-        }])->get();
+        try {
+            if ((!Session::has("type") && !Session::has("message")) || Session::get('type') == 'info') {
+                Session::flash('type', 'info');
+                Session::flash('message', 'Danh sách nhóm');
+            }
+            $members = Member::with('groupMemberships')->get();
 
-        return view('admin.index', compact('groups'));
+            $result = [
+                'suggested_groups' => [],
+                'compatibility_scores' => []
+            ];
+
+            $groupedMembers = GroupMember::with('member')
+                ->get()
+                ->groupBy('group_id');
+
+            foreach ($groupedMembers as $groupId => $groupMembers) {
+                $validMembers = $groupMembers->filter(function ($groupMember) {
+                    return $groupMember->member !== null;
+                });
+
+                if ($validMembers->isEmpty()) {
+                    continue;
+                }
+
+                $groupStats = $this->calculateGroupStats($validMembers);
+
+                $result['suggested_groups']["group_$groupId"] = [
+                    'members' => $validMembers->map(function ($groupMember) {
+                        return [
+                            'id' => $groupMember->member->id,
+                            'name' => $groupMember->member->name,
+                            'gpa' => $groupMember->member->gpa,
+                            'last_gpa' => $groupMember->member->last_gpa,
+                            'final_score' => $groupMember->member->final_score,
+                            'personality' => $groupMember->member->personality,
+                            'hobby' => $groupMember->member->hobby
+                        ];
+                    })->toArray(),
+                    'stats' => $groupStats
+                ];
+            }
+
+            foreach ($members as $member) {
+                $compatibilityScores = [];
+                foreach (range(1, 4) as $groupId) {
+                    $score = GroupMember::where('member_id', $member->id)
+                        ->where('group_id', $groupId)
+                        ->value('compatibility_score') ?? 0;
+
+                    $compatibilityScores[] = [
+                        'group_id' => $groupId,
+                        'score' => round($score, 2)
+                    ];
+                }
+
+                $result['compatibility_scores'][] = [
+                    'member_id' => $member->id,
+                    'scores' => $compatibilityScores
+                ];
+            }
+
+            return view('admin.group.dashboard', compact('result'));
+        } catch (\Exception $e) {
+            // Log lỗi nếu cần
+            Log::error('Group view error: ' . $e->getMessage());
+        }
     }
-
-    public function userDashboard()
+    private function calculateGroupStats($groupMembers)
     {
-        $user = auth()->user();
-        $member = Member::where('user_id', $user->id)->first();
-
-        if (!$member) {
-            return view('user.no-member-profile');
+        return [
+            'avg_gpa' => $groupMembers->avg('member.gpa'),
+            'avg_final_score' => $groupMembers->avg('member.final_score'),
+            'hobbies' => $groupMembers->pluck('member.hobby')->unique()->values()->toArray()
+        ];
+    }
+    public function userDashboard(Request $request)
+    {
+        if ((!Session::has("type") && !Session::has("message")) || Session::get('type') == 'info') {
+            Session::flash('type', 'info');
+            Session::flash('message', 'Danh sách thành viên');
         }
 
-        $suggestedGroups = GroupMember::with('group')
-            ->where('member_id', $member->id)
-            ->where('status', 'suggested')
-            ->orderBy('compatibility_score', 'desc')
-            ->get();
-
-        return view('user.dashboard', compact('member', 'suggestedGroups'));
+        $members = Member::all();
+        return view('admin.user.dashboard', compact('members'));
     }
 }

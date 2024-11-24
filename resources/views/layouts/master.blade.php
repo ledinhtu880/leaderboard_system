@@ -25,6 +25,7 @@
 
 <body>
     <main>
+        <div id="cover-spin"></div>
         @include('layouts.header')
         <article>
             @yield('content')
