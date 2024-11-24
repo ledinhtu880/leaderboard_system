@@ -178,7 +178,6 @@ def main():
         
         # Tính điểm tương thích của mỗi member với mỗi nhóm
         centers = kmeans.cluster_centers_
-        compatibility_scores = []
         
         for i, member in enumerate(members):
             member_scores = []
@@ -189,19 +188,12 @@ def main():
                     'group_id': j + 1,
                     'score': round(score, 2)
                 })
-            compatibility_scores.append({
-                'member_id': member['id'],
-                'scores': sorted(member_scores, key=lambda x: x['score'], reverse=True)
-            })
         
         # Phân phối members vào các nhóm theo thuật toán cân bằng
         groups = distribute_to_groups(members, features)
         
         # Tạo kết quả với thông tin chi tiết cho mỗi nhóm
-        result = {
-            'suggested_groups': {},
-            'compatibility_scores': compatibility_scores
-        }
+        result = {}
         
         # Hàm helper để chuyển đổi Decimal sang float
         def decimal_to_float(value):
@@ -236,7 +228,7 @@ def main():
             common_hobbies = [h[0] for h in common_hobbies]
             
             # Tạo thông tin chi tiết cho nhóm
-            result['suggested_groups'][f'group_{group_id + 1}'] = {
+            result[f'group_{group_id + 1}'] = {
                 'members': [
                     {
                         'id': str(member['id']),

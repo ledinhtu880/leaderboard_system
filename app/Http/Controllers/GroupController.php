@@ -33,19 +33,13 @@ class GroupController extends Controller
             GroupMember::where('status', 'suggested')->delete();
 
             // Lưu các nhóm được đề xuất
-            foreach ($result['suggested_groups'] as $groupName => $groupData) {
+            foreach ($result as $groupName => $groupData) {
                 $group = Group::firstOrCreate(['name' => $groupName]);
 
                 foreach ($groupData['members'] as $memberData) {
-                    // Tìm điểm tương thích từ compatibility_scores
-                    $compatibilityScore = collect($result['compatibility_scores'])
-                        ->where('member_id', $memberData['id'])
-                        ->first()['scores'][0]['score'];
-
                     GroupMember::create([
                         'group_id' => $group->id,
                         'member_id' => $memberData['id'],
-                        'compatibility_score' => $compatibilityScore,
                         'status' => 'suggested'
                     ]);
                 }
@@ -63,10 +57,7 @@ class GroupController extends Controller
             }
             $members = Member::with('groupMemberships')->get();
 
-            $result = [
-                'suggested_groups' => [],
-                'compatibility_scores' => []
-            ];
+            $result = [];
 
             $groupedMembers = GroupMember::with('member')
                 ->get()
@@ -83,7 +74,7 @@ class GroupController extends Controller
 
                 $groupStats = $this->calculateGroupStats($validMembers);
 
-                $result['suggested_groups']["group_$groupId"] = [
+                $result["group_$groupId"] = [
                     'members' => $validMembers->map(function ($groupMember) {
                         return [
                             'id' => $groupMember->member->id,
@@ -98,25 +89,7 @@ class GroupController extends Controller
                     'stats' => $groupStats
                 ];
             }
-
-            foreach ($members as $member) {
-                $compatibilityScores = [];
-                foreach (range(1, 4) as $groupId) {
-                    $score = GroupMember::where('member_id', $member->id)
-                        ->where('group_id', $groupId)
-                        ->value('compatibility_score') ?? 0;
-
-                    $compatibilityScores[] = [
-                        'group_id' => $groupId,
-                        'score' => round($score, 2)
-                    ];
-                }
-
-                $result['compatibility_scores'][] = [
-                    'member_id' => $member->id,
-                    'scores' => $compatibilityScores
-                ];
-            }
+            ksort($result);
 
             return view('admin.group.dashboard', compact('result'));
         } catch (\Exception $e) {
@@ -141,5 +114,34 @@ class GroupController extends Controller
 
         $members = Member::all();
         return view('admin.user.dashboard', compact('members'));
+    }
+    public function updateGroups(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->all() as $groupId => $memberIds) {
+                DB::table('group_member')
+                    ->whereIn('member_id', $memberIds)
+                    ->update([
+                        'group_id' => $groupId,
+                        'updated_at' => now()
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Phân nhóm đã được cập nhật thành công'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'danger',
+                'message' => 'Có lỗi xảy ra khi cập nhật phân nhóm',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

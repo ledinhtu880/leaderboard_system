@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <style>
         .error-message {
             color: #dc3545;
@@ -76,16 +77,15 @@
                 showToast(message, type);
             }
 
-            // Regex patterns
             const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
             const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
 
             $('#username').on('input', function() {
-                validateUsername();
+                hideError($(this).next());
             });
 
             $('#password').on('input', function() {
-                validatePassword();
+                hideError($(this).next());
             });
 
             $('#loginForm').on('submit', function(e) {
