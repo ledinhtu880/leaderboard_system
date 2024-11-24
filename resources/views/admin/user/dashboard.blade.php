@@ -3,6 +3,27 @@
 @section('title', 'Danh sách thành viên')
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <style>
+        table.dataTable>thead .sorting:after,
+        table.dataTable>thead .sorting_asc:after,
+        table.dataTable>thead .sorting_desc:after,
+        table.dataTable>thead .sorting_asc_disabled:after,
+        table.dataTable>thead .sorting_desc_disabled:after {
+            left: -.5em;
+            right: 0px;
+            content: "↓";
+        }
+
+        table.dataTable>thead .sorting:before,
+        table.dataTable>thead .sorting_asc:before,
+        table.dataTable>thead .sorting_desc:before,
+        table.dataTable>thead .sorting_asc_disabled:before,
+        table.dataTable>thead .sorting_desc_disabled:before {
+            left: -1em;
+            right: 0px;
+            content: "↑";
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -47,7 +68,6 @@
                 </table>
             </div>
         </div>
-        <!-- Stats Cards -->
         <div class="row mt-4">
             <div class="col-md-4">
                 <div class="card stats-card">
@@ -111,18 +131,15 @@
                 return (sum / data.length).toFixed(2);
             }
 
-            // Hàm cập nhật thống kê
             function updateStats(api) {
                 const filteredData = api.rows({
                     search: 'applied'
                 }).data().toArray();
 
-                // Cập nhật các giá trị thống kê
-                $('#avgGPA').text(calculateAverage(filteredData, 1)); // 1 là index của cột GPA
-                $('#avgFinalScore').text(calculateAverage(filteredData, 3)); // 3 là index của cột Điểm cuối kỳ
+                $('#avgGPA').text(calculateAverage(filteredData, 1));
+                $('#avgFinalScore').text(calculateAverage(filteredData, 3));
                 $('#totalMembers').text(filteredData.length);
 
-                // Animation cho việc cập nhật
                 $('.stats-card').each(function() {
                     $(this).addClass('border-primary');
                     setTimeout(() => {
@@ -131,7 +148,6 @@
                 });
             }
 
-            // Khởi tạo DataTable
             const table = $('#membersTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json'
@@ -140,8 +156,8 @@
                     [1, 'desc']
                 ],
                 pageLength: 10,
-                scrollY: '300px', // Giới hạn chiều cao của bảng (500px có thể thay đổi tùy ý)
-                scrollCollapse: true, // Cho phép thu gọn bảng nếu dữ liệu ít hơn chiều cao
+                scrollY: '300px',
+                scrollCollapse: true,
                 lengthMenu: [
                     [10, 25, 50, -1],
                     [10, 25, 50, "Tất cả"]
@@ -152,6 +168,10 @@
                     },
                     {
                         targets: 4,
+                        orderable: false
+                    },
+                    {
+                        targets: 5,
                         orderable: false
                     }
                 ],

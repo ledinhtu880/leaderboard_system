@@ -42,6 +42,7 @@
 .dropdown-toggle::after {
     margin-left: 0.5rem;
     vertical-align: middle;
+    display: inline;
 }
 
 .dropdown-menu {
@@ -62,12 +63,6 @@
 
 .dropdown-divider {
     margin: 0.5rem 0;
-}
-
-.user-dropdown {
-    padding: 5px;
-    border-radius: 30px;
-    transition: background-color 0.3s ease;
 }
 
 .user-dropdown:hover {

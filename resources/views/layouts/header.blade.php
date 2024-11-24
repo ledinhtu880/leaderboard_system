@@ -5,8 +5,8 @@
                 <h5 class="brand-title">Cụm 2</h5>
             </a>
             <div class="dropdown text-end">
-                <a href="#" class="d-block text-decoration-none dropdown-toggle user-dropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="text-decoration-none dropdown-toggle user-dropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <div class="d-flex align-items-center">
                         <span class="account-avatar rounded-circle">
                             {{ session('firstCharacter') }}
@@ -16,7 +16,7 @@
                                 {{ session('name') }}
                             </span>
                             <span class="account-role">
-                                Sinh viên
+                                {{ session('role') }}
                             </span>
                         </div>
                     </div>
