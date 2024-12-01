@@ -33,9 +33,13 @@
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow">
                     <div class="card-body p-5">
-                        <h3 class="card-title text-center mb-4">Đăng nhập</h3>
-                        <form id="loginForm" method="POST" action={{ route('checkLogin') }} novalidate>
+                        <h3 class="card-title text-center mb-4">Đăng ký</h3>
+                        <form id="registerForm" method="POST" action={{ route('checkLogin') }} novalidate>
                             @csrf
+                            <div class="mb-3 text-center">
+                                <small>Hãy nhập thông tin trang sinhvien, sẽ tự động đăng ký tài
+                                    khoản và thêm điểm số vào CSDL</small>
+                            </div>
                             <div class="mb-3">
                                 <label for="username" class="form-label">Tên đăng nhập</label>
                                 <input type="text" class="form-control" id="username" name="username"
@@ -48,17 +52,8 @@
                                     placeholder="Nhập mật khẩu">
                                 <div class="error-message" id="password-error"></div>
                             </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
-                            </div>
                             <div class="mb-3 d-grid">
-                                <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                            </div>
-                            <div class="mb-3 text-center">
-                                <small>Chưa có tài khoản?
-                                    <a href="{{ route('register') }}" class="text-decoration-none">Đăng ký</a>
-                                </small>
+                                <button type="submit" class="btn btn-primary">Đăng ký</button>
                             </div>
                         </form>
                     </div>
@@ -82,73 +77,27 @@
                 showToast(message, type);
             }
 
-            const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
-            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
-
-            $('#username').on('input', function() {
-                hideError($(this).next());
-            });
-
-            $('#password').on('input', function() {
-                hideError($(this).next());
-            });
-
-            $('#loginForm').on('submit', function(e) {
+            $('#registerForm').on('submit', function(e) {
                 e.preventDefault();
 
-                const isUsernameValid = validateUsername();
-                const isPasswordValid = validatePassword();
-
-                if (isUsernameValid && isPasswordValid) {
-                    this.submit();
-                }
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('handleRegister') }}",
+                    data: {
+                        username: $('#username').val(),
+                        password: $('#password').val(),
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        showToast(response.message, response.status);
+                    },
+                    error: function(xhr) {
+                        // Xử lý lỗi khi gửi yêu cầu Ajax
+                        console.log(xhr.responseText);
+                        alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+                    }
+                });
             });
-
-            function validateUsername() {
-                const username = $('#username').val();
-                const errorElement = $('#username-error');
-
-                if (!username) {
-                    showError(errorElement, 'Vui lòng nhập tên đăng nhập');
-                    return false;
-                }
-
-                if (!usernamePattern.test(username)) {
-                    showError(errorElement, 'Tên đăng nhập phải từ 6-20 ký tự và chỉ chứa chữ cái hoặc số');
-                    return false;
-                }
-
-                hideError(errorElement);
-                return true;
-            }
-
-            function validatePassword() {
-                const password = $('#password').val();
-                const errorElement = $('#password-error');
-
-                if (!password) {
-                    showError(errorElement, 'Vui lòng nhập mật khẩu');
-                    return false;
-                }
-
-                if (!passwordPattern.test(password)) {
-                    showError(errorElement, 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số');
-                    return false;
-                }
-
-                hideError(errorElement);
-                return true;
-            }
-
-            function showError(element, message) {
-                element.text(message).show();
-                element.prev('input').addClass('is-invalid');
-            }
-
-            function hideError(element) {
-                element.hide();
-                element.prev('input').removeClass('is-invalid');
-            }
         });
     </script>
 </body>

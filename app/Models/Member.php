@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Member extends Model
 {
+    public $timestamps = false;
     protected $fillable = [
         'user_id',
         'name',

@@ -210,7 +210,7 @@
             });
 
             table.on('length.dt', function() {
-                updateStats(table); // Gọi updateStats khi thay đổi số lượng hiển thị
+                updateStats(table);
             });
 
             table.on('page.dt', function() {
