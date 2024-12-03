@@ -45,117 +45,12 @@
     }
 }
 
-.custom-navbar {
-    background: #2c3e50;
-    padding: 12px 0;
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-}
-
-.navbar-brand {
-    color: white !important;
-    font-weight: 600;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-}
-
-/* Sidebar Styles */
-#sidebar {
-    min-width: 250px;
-    max-width: 250px;
-    height: calc(100vh - 64px); /* Subtract navbar height */
-    position: sticky;
-    top: 64px; /* Match navbar height */
-    left: 0;
-    background-color: #f8f9fa;
-    transition: all 0.3s;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-}
-
-#sidebar.collapsed {
-    margin-left: -250px;
-}
-
-#content {
-    width: 100%;
-    min-height: calc(100vh - 64px);
-    transition: all 0.3s;
-    padding: 20px;
-}
-
-@media (max-width: 768px) {
-    #sidebar {
-        position: fixed;
-        height: 100vh;
-        top: 0;
-        margin-left: -250px;
-    }
-
-    #content {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    #sidebar.show {
-        margin-left: 0;
-    }
-}
-
-.sidebar-link {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    color: #333;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-.sidebar-link:hover {
-    background-color: #e9ecef;
-}
-
-.sidebar-link i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-
-/* User Menu Styling */
-.user-menu {
-    position: relative;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    margin-left: 20px;
-    padding-left: 20px;
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
 .user-avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     background: #3498db;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: 600;
-    margin-right: 10px;
-}
-.user-info {
-    color: white;
-    margin-right: 15px;
-}
-.user-name {
-    font-size: 0.9rem;
-    margin: 0;
-}
-.user-role {
-    font-size: 0.75rem;
-    opacity: 0.8;
-    margin: 0;
+    font-size: 20px;
 }

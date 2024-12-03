@@ -1,5 +1,4 @@
 .menu-item {
-    background-color: #0071c6;
     flex: 1;
     transition: all 0.3s ease;
     min-width: 200px;
@@ -7,7 +6,6 @@
 }
 
 .menu-item:hover {
-    background-color: #005aa1;
     transform: translateY(-5px);
 }
 
