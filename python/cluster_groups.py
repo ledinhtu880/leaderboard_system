@@ -42,25 +42,18 @@ def prepare_data(members):
             
         # Chuẩn hóa dữ liệu số
         numeric_features = np.array([
-            [float(m['gpa']), float(m['last_gpa']), float(m['final_score'])]
+            [float(m['gpa']), float(m['last_gpa'])]
             for m in members
         ])
         scaler = StandardScaler()
         numeric_scaled = scaler.fit_transform(numeric_features)
         
-        # Mã hóa dữ liệu categorical
-        personality_encoded = encode_categorical(members, 'personality')
-        hobby_encoded = encode_categorical(members, 'hobby')
-        
         # Tính điểm tổng hợp với trọng số
         weighted_features = []
         for i in range(len(members)):
             feature = np.array([
-                numeric_scaled[i][0] * 0.4,  # GPA (40%)
-                numeric_scaled[i][1] * 0.1,  # last_GPA (10%)
-                numeric_scaled[i][2] * 0.1,  # final_score (10%)
-                personality_encoded[i] * 0.2,  # personality (20%)
-                hobby_encoded[i] * 0.2  # hobby (20%)
+                numeric_scaled[i][0] * 0.5,  # GPA (50%)
+                numeric_scaled[i][1] * 0.5,  # last_GPA (50%)
             ])
             weighted_features.append(feature)
         
@@ -75,9 +68,8 @@ def distribute_to_groups(members, features, n_groups=4, members_per_group=5):
         # Tính điểm tổng hợp cho mỗi thành viên
         member_scores = []
         for i, member in enumerate(members):
-            score = float(member['gpa']) * 0.4 + \
-                    float(member['last_gpa']) * 0.1 + \
-                    float(member['final_score']) * 0.1
+            score = float(member['gpa']) * 0.5 + \
+                    float(member['last_gpa']) * 0.5
             member_scores.append((i, score, member))
         
         # Sắp xếp thành viên theo điểm số
@@ -208,24 +200,7 @@ def main():
         for group_id, group_members in groups.items():
             # Tính các giá trị trung bình
             valid_gpas = [decimal_to_float(m.get('gpa')) for m in group_members if m.get('gpa') != 'N/A']
-            valid_final_scores = [decimal_to_float(m.get('final_score')) for m in group_members if m.get('final_score') != 'N/A']
-            
             avg_gpa = sum(valid_gpas) / len(valid_gpas) if valid_gpas else 0
-            avg_final_score = sum(valid_final_scores) / len(valid_final_scores) if valid_final_scores else 0
-            
-            # Tập hợp sở thích của nhóm
-            all_hobbies = []
-            for member in group_members:
-                if isinstance(member.get('hobby'), str):
-                    hobbies = [h.strip() for h in member['hobby'].split(',')]
-                    all_hobbies.extend(hobbies)
-            
-            # Lấy các sở thích phổ biến nhất
-            hobby_counts = {}
-            for hobby in all_hobbies:
-                hobby_counts[hobby] = hobby_counts.get(hobby, 0) + 1
-            common_hobbies = sorted(hobby_counts.items(), key=lambda x: x[1], reverse=True)[:3]
-            common_hobbies = [h[0] for h in common_hobbies]
             
             # Tạo thông tin chi tiết cho nhóm
             result[f'group_{group_id + 1}'] = {
@@ -233,18 +208,13 @@ def main():
                     {
                         'id': str(member['id']),
                         'name': member['name'],
-                        'personality': str(member.get('personality', 'N/A')),
                         'gpa': decimal_to_float(member.get('gpa')),
                         'last_gpa': decimal_to_float(member.get('last_gpa')),
-                        'final_score': decimal_to_float(member.get('final_score')),
-                        'hobby': str(member.get('hobby', 'N/A'))
                     }
                     for member in group_members
                 ],
                 'stats': {
                     'avg_gpa': round(avg_gpa, 2),
-                    'avg_final_score': round(avg_final_score, 2),
-                    'hobbies': common_hobbies
                 }
             }
         

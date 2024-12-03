@@ -11,4 +11,8 @@ class HomeController extends Controller
     {
         return view("index");
     }
+    public function userTopic()
+    {
+        return view('user.topic');
+    }
 }

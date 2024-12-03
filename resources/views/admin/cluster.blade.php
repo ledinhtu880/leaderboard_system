@@ -79,10 +79,6 @@
                                             <h6 class="mb-2">Thống kê nhóm:</h6>
                                             <small>
                                                 <div><i class="fas fa-chart-line text-info"></i> GPA TB: ${stats.avg_gpa}</div>
-                                                <div><i class="fas fa-star text-warning"></i> Điểm TB: ${stats.avg_final_score}</div>
-                                                <div class="text-truncate">
-                                                    <i class="fas fa-heart text-danger"></i> Sở thích: ${stats.hobbies.join(', ') || 'Chưa có'}
-                                                </div>
                                             </small>
                                         </div>
                                         <!-- Members List -->
@@ -97,21 +93,9 @@
                         const lastGpa = member.last_gpa !== 'N/A' ?
                             parseFloat(member.last_gpa).toFixed(2) :
                             'N/A';
-                        const finalScore = member.final_score !== 'N/A' ?
-                            parseFloat(member.final_score)
-                            .toFixed(2) :
-                            'N/A';
-
-                        // Xử lý hiển thị sở thích
-                        const hobby = member.hobby === 'N/A' ? 'Chưa có' : member.hobby;
-
-                        // Tạo màu badge dựa trên personality
-                        const personalityColor = getPersonalityColor(member.personality);
-
                         html += `<li class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
                                         <strong>${member.name}</strong>
-                                        <span class="badge ${personalityColor}">${member.personality == 0 ? "Hướng nội" : "Hướng ngoại"}</span>
                                     </div>
                                     <div class="small">
                                         <div class="row">
@@ -120,14 +104,6 @@
                                             </div>
                                             <div class="col-6" title="GPA Kỳ trước">
                                                 <i class="fas fa-history text-info"></i> Last: ${lastGpa}
-                                            </div>
-                                        </div>
-                                        <div class="row mt-1">
-                                            <div class="col-6" title="Điểm tổng kết">
-                                                <i class="fas fa-star text-warning"></i> Final: ${finalScore}
-                                            </div>
-                                            <div class="col-6 text-truncate" title="${hobby}">
-                                                <i class="fas fa-heart text-danger"></i> ${hobby}
                                             </div>
                                         </div>
                                     </div>
@@ -146,16 +122,6 @@
 
                 // Khởi tạo tooltips
                 $('[title]').tooltip();
-            }
-
-            // Hàm helper để xác định màu cho personality
-            function getPersonalityColor(personality) {
-                const colors = {
-                    '0': 'bg-info',
-                    '1': 'bg-primary',
-                };
-
-                return colors[personality] || 'bg-secondary';
             }
         });
     </script>

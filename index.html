@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dashboard v3</title>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        />
+        <style>
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 200px;
+                background-color: #333;
+                color: #fff;
+                padding: 20px;
+            }
+
+            .sidebar .logo {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+
+            .sidebar .user {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .sidebar .user .avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+
+            .sidebar .user .name {
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+            .sidebar .user .role {
+                font-size: 14px;
+                color: #ccc;
+            }
+
+            .main-content {
+                margin-left: 220px;
+                padding: 20px;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .header .fa-bars {
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .header .user-info {
+                display: flex;
+                align-items: center;
+            }
+
+            .header .user-info .avatar {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+
+            .header .user-info .name {
+                font-size: 16px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo">Dashboard v3</div>
+            <div class="user">
+                <img
+                    class="avatar"
+                    src="https://via.placeholder.com/40"
+                    alt="Avatar"
+                />
+                <div>
+                    <div class="name">John Doe</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+            <nav>
+                <a href="#">Home</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <i class="fas fa-bars"></i>
+                <div class="user-info">
+                    <img
+                        class="avatar"
+                        src="https://via.placeholder.com/30"
+                        alt="Avatar"
+                    />
+                    <div class="name">John Doe</div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

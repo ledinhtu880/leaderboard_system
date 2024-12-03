@@ -15,7 +15,6 @@ class GroupMember extends Pivot
         'group_id',
         'member_id',
         'compatibility_score',
-        'status',
     ];
 
     protected $casts = [

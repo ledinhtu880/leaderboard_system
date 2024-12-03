@@ -16,15 +16,11 @@ class Member extends Model
         'name',
         'gpa',
         'last_gpa',
-        'final_score',
-        'personality',
-        'hobby',
     ];
 
     protected $casts = [
         'gpa' => 'float',
         'last_gpa' => 'float',
-        'final_score' => 'float',
     ];
 
     public function groupMemberships()
@@ -36,21 +32,6 @@ class Member extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function groups(): BelongsToMany
-    {
-        return $this->belongsToMany(Group::class, 'group_member')
-            ->withPivot(['compatibility_score', 'status'])
-            ->withTimestamps();
-    }
-
-    public function suggestedGroups(): BelongsToMany
-    {
-        return $this->groups()
-            ->wherePivot('status', 'suggested')
-            ->orderByPivot('compatibility_score', 'desc');
-    }
-
     public function confirmedGroups(): BelongsToMany
     {
         return $this->groups()

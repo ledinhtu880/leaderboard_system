@@ -24,6 +24,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('checklogin')->group(function () {
     Route::get('', [HomeController::class, 'index'])->name('home');
+    Route::get('user/topics', [HomeController::class, 'userTopic'])->name('user.topics');
     Route::get('cluster/', [GroupController::class, 'clusterView'])->name('clusterView');
     Route::get('run_cluster', [GroupController::class, 'runCluster'])->name('run_cluster');
     Route::get('admin/groups/', [GroupController::class, 'groupDashboard'])->name('groupDashboard');

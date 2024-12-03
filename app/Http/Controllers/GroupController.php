@@ -29,10 +29,6 @@ class GroupController extends Controller
 
         // Lưu kết quả vào database
         DB::transaction(function () use ($result) {
-            // Xóa các suggested groups cũ
-            GroupMember::where('status', 'suggested')->delete();
-
-            // Lưu các nhóm được đề xuất
             foreach ($result as $groupName => $groupData) {
                 $group = Group::firstOrCreate(['name' => $groupName]);
 
@@ -40,7 +36,6 @@ class GroupController extends Controller
                     GroupMember::create([
                         'group_id' => $group->id,
                         'member_id' => $memberData['id'],
-                        'status' => 'suggested'
                     ]);
                 }
             }
@@ -81,9 +76,6 @@ class GroupController extends Controller
                             'name' => $groupMember->member->name,
                             'gpa' => $groupMember->member->gpa,
                             'last_gpa' => $groupMember->member->last_gpa,
-                            'final_score' => $groupMember->member->final_score,
-                            'personality' => $groupMember->member->personality,
-                            'hobby' => $groupMember->member->hobby
                         ];
                     })->toArray(),
                     'stats' => $groupStats
@@ -101,8 +93,6 @@ class GroupController extends Controller
     {
         return [
             'avg_gpa' => $groupMembers->avg('member.gpa'),
-            'avg_final_score' => $groupMembers->avg('member.final_score'),
-            'hobbies' => $groupMembers->pluck('member.hobby')->unique()->values()->toArray()
         ];
     }
     public function userDashboard(Request $request)
@@ -126,7 +116,6 @@ class GroupController extends Controller
                     ->update([
                         'group_id' => $groupId,
                         'updated_at' => now(),
-                        'status' => 'confirmed'
                     ]);
             }
 

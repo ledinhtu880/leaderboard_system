@@ -13,35 +13,8 @@ class Group extends Model
         'description',
     ];
 
-    public function members(): BelongsToMany
-    {
-        return $this->belongsToMany(Member::class, 'group_member')
-            ->withPivot(['compatibility_score', 'status'])
-            ->withTimestamps();
-    }
-
-    public function suggestedMembers(): BelongsToMany
-    {
-        return $this->members()
-            ->wherePivot('status', 'suggested')
-            ->orderByPivot('compatibility_score', 'desc');
-    }
-
-    public function confirmedMembers(): BelongsToMany
-    {
-        return $this->members()
-            ->wherePivot('status', 'confirmed');
-    }
-
     public function getAverageGpaAttribute()
     {
         return $this->members()->avg('gpa');
-    }
-
-    public function getAverageCompatibilityScoreAttribute()
-    {
-        return $this->members()
-            ->wherePivot('status', 'suggested')
-            ->avg('group_member.compatibility_score');
     }
 }

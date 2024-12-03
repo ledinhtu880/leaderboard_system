@@ -8,20 +8,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li
-                        class="nav-item {{ Str::startsWith(request()->url(), url('/admin/groups/')) ? ' active' : '' }}">
-                        <a class="nav-link" href="{{ route('groupDashboard') }}">
-                            <i class="fas fa-users me-1"></i>Danh sách nhóm
-                        </a>
-                    </li>
-                    <li class="nav-item {{ Str::startsWith(request()->url(), url('/admin/users/')) ? ' active' : '' }}">
-                        <a class="nav-link" href="{{ route('userDashboard') }}">
-                            <i class="fas fa-users me-1"></i>Danh sách thành viên
-                        </a>
-                    </li>
-                </ul>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <div class="user-menu" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="user-avatar">
                         {{ session('firstCharacter') }}
@@ -45,3 +32,23 @@
         </div>
     </nav>
 </header>
+
+
+{{-- <ul class="navbar-nav mx-auto">
+                    <li
+                        class="nav-item {{ Str::startsWith(request()->url(), url('/admin/groups/')) ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('groupDashboard') }}">
+                            <i class="fas fa-users me-1"></i>Danh sách nhóm
+                        </a>
+                    </li>
+                    <li class="nav-item {{ Str::startsWith(request()->url(), url('/admin/users/')) ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('userDashboard') }}">
+                            <i class="fas fa-users me-1"></i>Danh sách thành viên
+                        </a>
+                    </li>
+                    <li class="nav-item {{ Str::startsWith(request()->url(), url('/admin/users/')) ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('user.topics') }}">
+                            <i class="fas fa-users me-1"></i>Danh sách thành viên
+                        </a>
+                    </li>
+                </ul> --}}

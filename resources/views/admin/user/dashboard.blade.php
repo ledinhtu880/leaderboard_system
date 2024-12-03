@@ -39,9 +39,6 @@
                             <th>Tên</th>
                             <th>GPA</th>
                             <th>GPA kỳ gần nhất</th>
-                            <th>Điểm cuối kỳ</th>
-                            <th>Tính cách</th>
-                            <th>Sở thích</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,13 +52,6 @@
                                 <td>{{ $member->name }}</td>
                                 <td>{{ number_format($member->gpa, 2) }}</td>
                                 <td>{{ number_format($member->last_gpa, 2) }}</td>
-                                <td>{{ number_format($member->final_score, 2) }}</td>
-                                <td>
-                                    <span class="badge bg-info badge-personality">
-                                        {{ $member->personality == 0 ? 'Hướng nội' : 'Hướng ngoại' }}
-                                    </span>
-                                </td>
-                                <td>{{ $member->hobby }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -69,7 +59,7 @@
             </div>
         </div>
         <div class="row mt-4">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="card stats-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -84,22 +74,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-icon bg-success bg-opacity-10">
-                                    <i class="fas fa-graduation-cap text-success"></i>
-                                </div>
-                                <div class="stats-value" id="avgFinalScore">-</div>
-                                <div class="stats-label">Điểm cuối kỳ TB</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="card stats-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -147,7 +122,6 @@
                 }
 
                 $('#avgGPA').text(calculateAverage(filteredData, 1));
-                $('#avgFinalScore').text(calculateAverage(filteredData, 3));
                 $('#totalMembers').text(filteredData.length);
 
                 // Cập nhật hiển thị số lượng thành viên sau khi thay đổi
@@ -181,18 +155,9 @@
                     [10, 25, 50, "Tất cả"]
                 ],
                 columnDefs: [{
-                        targets: 0,
-                        orderable: false
-                    },
-                    {
-                        targets: 4,
-                        orderable: false
-                    },
-                    {
-                        targets: 5,
-                        orderable: false
-                    }
-                ],
+                    targets: 0,
+                    orderable: false
+                }, ],
                 dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
                     '<"row"<"col-sm-12"tr>>' +
                     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',

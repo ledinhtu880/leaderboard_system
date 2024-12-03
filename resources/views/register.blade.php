@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <style>
         .error-message {
@@ -31,6 +32,7 @@
     <div class="container">
         <div class="row justify-content-center align-items-center min-vh-100">
             <div class="col-md-6 col-lg-4">
+                <div id="cover-spin"></div>
                 <div class="card shadow">
                     <div class="card-body p-5">
                         <h3 class="card-title text-center mb-4">Đăng ký</h3>
@@ -55,6 +57,11 @@
                             <div class="mb-3 d-grid">
                                 <button type="submit" class="btn btn-primary">Đăng ký</button>
                             </div>
+                            <div class="mb-3 text-center">
+                                <small>Đã có tài khoản?
+                                    <a href="{{ route('login') }}" class="text-decoration-none">Đăng ký</a>
+                                </small>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -76,13 +83,13 @@
             if (message && type) {
                 showToast(message, type);
             }
-
             $('#registerForm').on('submit', function(e) {
+                $("#cover-spin").show();
                 e.preventDefault();
 
                 $.ajax({
                     type: 'POST',
-                    url: "{{ route('handleRegister') }}",
+                    url: "/handleRegister",
                     data: {
                         username: $('#username').val(),
                         password: $('#password').val(),
@@ -95,6 +102,9 @@
                         // Xử lý lỗi khi gửi yêu cầu Ajax
                         console.log(xhr.responseText);
                         alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+                    },
+                    complete: function() {
+                        $("#cover-spin").hide();
                     }
                 });
             });
