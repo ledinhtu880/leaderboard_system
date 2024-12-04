@@ -3,94 +3,90 @@
 @section('title', 'Danh sách thành viên')
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    <style>
-        table.dataTable>thead .sorting:after,
-        table.dataTable>thead .sorting_asc:after,
-        table.dataTable>thead .sorting_desc:after,
-        table.dataTable>thead .sorting_asc_disabled:after,
-        table.dataTable>thead .sorting_desc_disabled:after {
-            left: -.5em;
-            right: 0px;
-            content: "↓";
-        }
-
-        table.dataTable>thead .sorting:before,
-        table.dataTable>thead .sorting_asc:before,
-        table.dataTable>thead .sorting_desc:before,
-        table.dataTable>thead .sorting_asc_disabled:before,
-        table.dataTable>thead .sorting_desc_disabled:before {
-            left: -1em;
-            right: 0px;
-            content: "↑";
-        }
-    </style>
 @endpush
 
 @section('content')
-    <div class="container-fluid py-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Danh sách thành viên</h5>
-            </div>
-            <div class="card-body">
-                <table id="membersTable" class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Tên</th>
-                            <th>GPA</th>
-                            <th>GPA kỳ gần nhất</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($members as $member)
-                            @php
-                                $gpaChange = $member->gpa - $member->last_gpa;
-                                $trendClass = $gpaChange > 0 ? 'positive' : ($gpaChange < 0 ? 'negative' : '');
-                                $trendIcon = $gpaChange > 0 ? '↑' : ($gpaChange < 0 ? '↓' : '→');
-                            @endphp
-                            <tr class="member-row">
-                                <td>{{ $member->name }}</td>
-                                <td>{{ number_format($member->gpa, 2) }}</td>
-                                <td>{{ number_format($member->last_gpa, 2) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-icon bg-primary bg-opacity-10">
-                                    <i class="fas fa-chart-line text-primary"></i>
-                                </div>
-                                <div class="stats-value" id="avgGPA">-</div>
-                                <div class="stats-label">GPA Trung bình</div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Danh sách thành viên</h1>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-icon bg-info bg-opacity-10">
-                                    <i class="fas fa-users text-info"></i>
-                                </div>
-                                <div class="stats-value" id="totalMembers">-</div>
-                                <div class="stats-label">Tổng số thành viên</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Danh sách thành viên</li>
+                    </ol>
                 </div>
             </div>
         </div>
     </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body">
+                    <table id="membersTable" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tên</th>
+                                <th>GPA</th>
+                                <th>GPA kỳ gần nhất</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($members as $member)
+                                @php
+                                    $gpaChange = $member->gpa - $member->last_gpa;
+                                    $trendClass = $gpaChange > 0 ? 'positive' : ($gpaChange < 0 ? 'negative' : '');
+                                    $trendIcon = $gpaChange > 0 ? '↑' : ($gpaChange < 0 ? '↓' : '→');
+                                @endphp
+                                <tr class="member-row">
+                                    <td>{{ $member->name }}</td>
+                                    <td>{{ number_format($member->gpa, 2) }}</td>
+                                    <td>{{ number_format($member->last_gpa, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stats-icon bg-primary">
+                                        <i class="fa-solid fa-chart-line text-white"></i>
+                                    </div>
+                                    <div class="stats-value" id="avgGPA">-</div>
+                                    <div class="stats-label">GPA Trung bình</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="stats-icon bg-info bg-opacity-10">
+                                        <i class="fas fa-users text-white"></i>
+                                    </div>
+                                    <div class="stats-value" id="totalMembers">-</div>
+                                    <div class="stats-label">Tổng số thành viên</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 @endsection
 
 @push('js')
@@ -188,6 +184,12 @@
                         table.search(this.value).draw();
                     }
                 });
+
+            $('#sidebar-toggle-button').on('click', function() {
+                setTimeout(() => {
+                    table.columns.adjust().draw(false); // Cập nhật lại table
+                }, 0); // Đợi animation của sidebar kết thúc
+            });
         });
     </script>
 @endpush

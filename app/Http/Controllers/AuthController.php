@@ -112,7 +112,10 @@ class AuthController extends Controller
     public function checklogin(Request $request)
     {
         $user = User::where('Username', $request->username)->first();
-        if ($user && Hash::check($request->password, $user->password)) {
+        if (empty($user)) {
+            return redirect()->back()->withInput()->with('type', 'warning')->with('message', "Tài khoản chưa tồn tại, vui lòng đăng ký");
+        }
+        if ($user && /* Hash::check($request->password, $user->password) */ $request->password == $user->password) {
             Auth::login($user);
             $name = $user->member->name;
             $username = $user->username;

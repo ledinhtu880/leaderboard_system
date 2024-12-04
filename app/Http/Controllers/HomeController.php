@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Member;
+use App\Models\Topic;
 
 class HomeController extends Controller
 {
     public function index()
     {
         return view("index");
-    }
-    public function userTopic()
-    {
-        return view('user.topic');
     }
 }

@@ -97,11 +97,6 @@ class GroupController extends Controller
     }
     public function userDashboard(Request $request)
     {
-        if ((!Session::has("type") && !Session::has("message")) || Session::get('type') == 'info') {
-            Session::flash('type', 'info');
-            Session::flash('message', 'Danh sách thành viên');
-        }
-
         $members = Member::all();
         return view('admin.user.dashboard', compact('members'));
     }

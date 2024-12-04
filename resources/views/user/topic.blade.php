@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.master')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Chọn Chủ Đề Dự Án</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Trang chủ')
+
+@push('css')
     <style>
         .topic-card {
             cursor: pointer;
@@ -12,7 +10,7 @@
         }
 
         .topic-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.02);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
@@ -21,70 +19,56 @@
             background-color: #f8f9fa;
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Chọn Chủ Đề Dự Án</h3>
+@section('content')
+    <!-- Content header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Chọn đề tài</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Chọn đề tài</li>
+                    </ol>
+                </div>
             </div>
-            <div class="card-body">
-                <form id="topicRegistrationForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card topic-card" data-topic-id="1">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Hệ thống kinh doanh thông minh cho nông nghiệp</h5>
-                                    <p class="card-text">Phát triển một ứng dụng di động giúp nông dân quản lý mùa vụ,
-                                        theo dõi tình trạng cây trồng và cung cấp dự báo thời tiết dựa trên dữ liệu lớn
-                                        và trí tuệ nhân tạo, từ đó tối ưu hóa quy trình sản xuất</p>
-                                    <input type="radio" name="topic_id" value="1" class="d-none topic-radio">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card topic-card" data-topic-id="2">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Hệ thống quản lý tài chính thông minh cho cá nhân</h5>
-                                    <p class="card-text">Xây dựng một ứng dụng quản lý chi tiêu cá nhân có tính năng
-                                        phân tích tài chính, lập kế hoạch ngân sách tự động và nhắc nhờ thanh toán hóa
-                                        đơn để giiups người theo dõi và cải thiện tình hình tài chính của mình</p>
-                                    <input type="radio" name="topic_id" value="2" class="d-none topic-radio">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card topic-card" data-topic-id="3">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Hệ thống tìm kiếm mặt bằng cho thuê thông minh</h5>
-                                    <p class="card-text">Tạo một nền tảng trực tuyến cho phép người dùng tìm kiếm mặt
-                                        bằng cho thuê với các bộ lọc thông minh như vị trí, giá cả, diện tích và loại
-                                        hình kinh doanh, đồng thời tích hợp đánh giá từ người thuê trước đó</p>
-                                    <input type="radio" name="topic_id" value="3" class="d-none topic-radio">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card topic-card" data-topic-id="4">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Hệ thống đào tạo thông minh cho sinh viên</h5>
-                                    <p class="card-text">Phát triển một nền tảng học trực tuyến sử dụng nhân tạo để cá
-                                        nhân hóa lộ trình học tập cho sinh viên, cung cấp tài liệu học tập phù hợp và
-                                        theo dõi tiến độ học tập của người dùng</p>
-                                    <input type="radio" name="topic_id" value="4" class="d-none topic-radio">
+        </div>
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                @foreach ($topics as $each)
+                    <div class="col-md-6 mb-4">
+                        <div class="card topic-card shadow-sm rounded {{ $selectedTopic && $selectedTopic == $each->id ? ' selected' : '' }}"
+                            data-topic-id="{{ $each->id }}">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title mb-2">{{ $each->name }}</h5>
+                                    <p class="card-text text-muted">{{ $each->description }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success mt-3" disabled id="submitBtn">Xác Nhận Chủ Đề</button>
-                </form>
+                @endforeach
+                <div class="row mt-4">
+                    <div class="col-12 d-flex justify-content-end">
+                        <button class="btn btn-primary" id="btnSave">Lưu lại</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+    <!-- /.content -->
+@endsection
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+@push('js')
     <script>
         $(document).ready(function() {
             $('.topic-card').on('click', function() {
@@ -93,28 +77,43 @@
                 $(this).find('.topic-radio').prop('checked', true);
                 $('#submitBtn').prop('disabled', false);
             });
+            $('#btnSave').on('click', function() {
+                var selectedTopic = $('.topic-card.selected');
+                if (selectedTopic.length === 0) {
+                    showToast("Vui lòng chọn một chủ đề", "warning");
+                    return;
+                }
 
-            $('#topicRegistrationForm').on('submit', function(e) {
-                e.preventDefault();
-
-                const topicId = $('input[name="topic_id"]:checked').val();
+                var topicId = selectedTopic.data('topic-id');
 
                 $.ajax({
-                    url: '/register-topic',
-                    method: 'POST',
+                    url: '/user/topics/store',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     data: {
-                        topic_id: topicId
+                        topic_id: topicId,
                     },
                     success: function(response) {
-                        alert('Đăng ký chủ đề thành công!');
+                        if (response.success) {
+                            showToast(response.message, response.status);
+                            setTimeout(() => {
+                                window.location.href = '';
+                            }, 1000);
+                        } else {
+                            showToast(response.message, response.status);
+                        }
                     },
-                    error: function() {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    error: function(xhr, status, error) {
+                        if (xhr.status === 400) {
+                            alert(xhr.responseJSON.error);
+                        } else {
+                            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                        }
                     }
                 });
             });
         });
     </script>
-</body>
-
-</html>
+@endpush
