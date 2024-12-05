@@ -10,36 +10,6 @@ use App\Models\User;
 
 class ApiController extends Controller
 {
-
-    public function updateGroups(Request $request)
-    {
-        try {
-            DB::beginTransaction();
-
-            foreach ($request->all() as $groupId => $memberIds) {
-                DB::table('group_member')
-                    ->whereIn('member_id', $memberIds)
-                    ->update([
-                        'group_id' => $groupId,
-                        'updated_at' => now(),
-                    ]);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Phân nhóm đã được cập nhật thành công'
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'danger',
-                'message' => 'Có lỗi xảy ra khi cập nhật phân nhóm',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
     public function storeTopic(Request $request)
     {
         if ($request->ajax()) {

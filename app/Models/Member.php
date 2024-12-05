@@ -29,11 +29,6 @@ class Member extends Model
         'subject_3_mark' => 'float',
     ];
 
-    public function groupMemberships()
-    {
-        return $this->hasMany(GroupMember::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
