@@ -19,7 +19,6 @@ use App\Http\Controllers\GroupController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
 Route::post('/update-groups', [ApiController::class, 'updateGroups']);
 Route::post('/store-topics', [ApiController::class, 'storeTopics']);
 Route::post('/run_clustering', [ApiController::class, 'runClustering']);

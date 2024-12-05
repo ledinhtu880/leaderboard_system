@@ -70,23 +70,6 @@ class ApiController extends Controller
         $output = shell_exec("python $pythonScript");
         $result = json_decode($output, true);
 
-        if (isset($result['error'])) {
-            return response()->json(['error' => $result['error']], 400);
-        }
-
-        DB::transaction(function () use ($result) {
-            foreach ($result as $groupName => $groupData) {
-                $group = Group::firstOrCreate(['name' => $groupName]);
-
-                foreach ($groupData['members'] as $memberData) {
-                    GroupMember::create([
-                        'group_id' => $group->id,
-                        'member_id' => $memberData['id'],
-                    ]);
-                }
-            }
-        });
-
         return response()->json($result);
     }
 }

@@ -3,6 +3,7 @@
 @section('title', 'Danh sách đề tài')
 
 @section('content')
+    <div id="cover-spin"></div>
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -22,56 +23,10 @@
 
     <!-- Main content -->
     <section class="content">
-        {{-- <div class="container-fluid">
-            <div class="row">
-                @foreach ($topics as $topic)
-                    <div class="col-md-6 mb-4">
-                        <div class="card shadow-sm hover-shadow">
-                            <div class="card-header bg-gradient-light d-flex justify-content-between align-items-center">
-                                <h3 class="card-title mb-0 text-primary">
-                                    <i class="fas fa-bookmark me-2"></i>{{ $topic->name }}
-                                </h3>
-                                <span
-                                    class="badge {{ $topic->members->count() >= 5 ? 'bg-danger' : 'bg-success' }} px-3 py-2">
-                                    <i class="fas fa-users me-1"></i>{{ $topic->members->count() }}/5
-                                </span>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text text-muted">
-                                    <i class="fas fa-info-circle me-2"></i>{{ $topic->description }}
-                                </p>
-                                <h5 class="mt-4 mb-3 text-secondary">
-                                    <i class="fas fa-user-friends me-2"></i>Thành viên
-                                </h5>
-                                <div class="list-group">
-                                    @foreach ($topic->members as $memberTopic)
-                                        <div
-                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="fas fa-user-circle me-2 text-primary"></i>
-                                                {{ $memberTopic->member->name }}
-                                            </div>
-                                            <button class="btn btn-outline-success btn-sm rounded-pill">
-                                                <i class="fas fa-check me-1"></i>Duyệt
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="card-footer bg-light d-flex justify-content-end">
-                                <button class="btn btn-primary btn-sm rounded-pill">
-                                    <i class="fas fa-cog me-1"></i>Quản lý
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div> --}}
         <div class="container-fluid">
             <div class="card shadow">
                 <div class="card-body">
-                    <table class="table table-hover" id="topicsTable">
+                    <table class="table" id="topicsTable">
                         <thead>
                             <tr class="align-middle">
                                 <th></th>
@@ -90,7 +45,7 @@
                                     <td class="fw-bold text-primary"
                                         style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         title="{{ $topic->name }}">
-                                        {{ $topic->name }}
+                                        Nhóm {{ $topic->id }}: {{ $topic->name }}
                                     </td>
                                     <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         title="{{ $topic->description }}">
@@ -107,15 +62,58 @@
                                     <td colspan="5">
                                         <div class="list-group mx-4 my-2">
                                             @foreach ($topic->members as $memberTopic)
-                                                <div
-                                                    class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <span>
-                                                        <i class="fas fa-user-circle me-2"></i>
-                                                        {{ $memberTopic->member->name }}
-                                                    </span>
-                                                    {{-- <button class="btn btn-outline-success btn-sm">
-                                                        <i class="fas fa-check me-1"></i>Duyệt
-                                                    </button> --}}
+                                                <div class="list-group-item">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <div>
+                                                            <span class="h6">
+                                                                <i class="fas fa-user-circle me-2"></i>
+                                                                {{ $memberTopic->member->name }}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="badge bg-info me-2">
+                                                                GPA: {{ $memberTopic->member->gpa }}
+                                                            </span>
+                                                            <span class="badge bg-secondary">
+                                                                GPA kỳ trước: {{ $memberTopic->member->last_gpa }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3">
+                                                        <div class="col-md-4">
+                                                            <div class="card border-0 bg-light">
+                                                                <div class="card-body p-2 text-center">
+                                                                    <div class="small text-muted mb-1">Môn học 1</div>
+                                                                    <div
+                                                                        class="h5 mb-0 {{ $memberTopic->member->subject_1_mark >= 7 ? 'text-success' : ($memberTopic->member->subject_1_mark >= 5 ? 'text-warning' : 'text-danger') }}">
+                                                                        {{ $memberTopic->member->subject_1_mark }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="card border-0 bg-light">
+                                                                <div class="card-body p-2 text-center">
+                                                                    <div class="small text-muted mb-1">Môn học 2</div>
+                                                                    <div
+                                                                        class="h5 mb-0 {{ $memberTopic->member->subject_2_mark >= 7 ? 'text-success' : ($memberTopic->member->subject_2_mark >= 5 ? 'text-warning' : 'text-danger') }}">
+                                                                        {{ $memberTopic->member->subject_2_mark }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="card border-0 bg-light">
+                                                                <div class="card-body p-2 text-center">
+                                                                    <div class="small text-muted mb-1">Môn học 3</div>
+                                                                    <div
+                                                                        class="h5 mb-0 {{ $memberTopic->member->subject_3_mark >= 7 ? 'text-success' : ($memberTopic->member->subject_3_mark >= 5 ? 'text-warning' : 'text-danger') }}">
+                                                                        {{ $memberTopic->member->subject_3_mark }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -140,101 +138,117 @@
 @push('js')
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
-    {{-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.list-group').each(function() {
-                new Sortable(this, {
-                    group: 'shared',
-                    animation: 150,
-                    onEnd: function(evt) {
-                        const memberId = $(evt.item).find('.fas').parent().text().trim();
-                        const newTopicRow = $(evt.to).closest('tr').prev();
-                        const oldTopicRow = $(evt.from).closest('tr').prev();
-
-                        updateMemberCount(newTopicRow);
-                        updateMemberCount(oldTopicRow);
-                    }
-                });
-            });
-
-            function updateMemberCount($topicRow) {
-                const $membersList = $topicRow.next().find('.list-group');
-                const count = $membersList.children().length;
-                const $badge = $topicRow.find('.badge');
-                $badge.text(`${count}/5`);
-                $badge.removeClass('bg-success bg-danger');
-                $badge.addClass(count >= 5 ? 'bg-danger' : 'bg-success');
-            }
-        });
-    </script> --}}
     <script>
         $(document).ready(function() {
             $('#btnArrange').click(function() {
-                // Hiển thị trạng thái đang xử lý
                 $(this).prop('disabled', true).text('Đang sắp xếp...');
+                $("#cover-spin").show();
 
-                // Gửi yêu cầu tới APIController
                 $.ajax({
-                    url: "{{ route('api.runClustering') }}", // Route của hàm runClustering()
-                    method: 'GET',
+                    url: "/api/run_clustering",
+                    method: 'POST',
                     success: function(response) {
-                        // Xóa dữ liệu cũ
+                        console.log(response);
                         $('#topicsTable tbody').empty();
 
-                        // Duyệt qua các nhóm mới sắp xếp
                         Object.keys(response.topic_groups).forEach(function(topicId) {
-                            const topicMembers = response.topic_groups[topicId];
+                            const topicData = response.topic_groups[topicId];
+                            const topicMembers = topicData.members;
+                            console.log(topicMembers);
 
-                            // Tạo dòng chính cho mỗi nhóm
                             const topicRow = `
-                                <tr class="align-middle">
-                                    <td class="text-center">
-                                        <i class="fas fa-plus-circle text-primary expand-details" style="cursor: pointer;"
-                                            data-topic="${topicId}"></i>
-                                    </td>
-                                    <td class="fw-bold text-primary" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="Nhóm ${topicId}">
-                                        Nhóm ${topicId}
-                                    </td>
-                                    <td style="max-width: 300px;">-</td>
-                                    <td class="text-center">
-                                        <span class="badge ${topicMembers.length >= 5 ? 'bg-danger' : 'bg-success'}">
-                                            ${topicMembers.length}/5
-                                        </span>
-                                    </td>
-                                </tr>
-                            `;
+            <tr class="align-middle">
+                <td class="text-center">
+                    <i class="fas fa-plus-circle text-primary expand-details" style="cursor: pointer;"
+                        data-topic="${topicId}"></i>
+                </td>
+                <td class="fw-bold text-primary" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${topicData.name}">
+                    ${topicData.name}
+                </td>
+                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${topicData.description}">
+                    ${topicData.description}
+                </td>
+                <td class="text-center">
+                    <span class="badge ${topicMembers.length >= 5 ? 'bg-danger' : 'bg-success'}">
+                        ${topicMembers.length}/5
+                    </span>
+                </td>
+            </tr>
+        `;
 
-                            // Tạo dòng chi tiết thành viên
                             const memberDetailsRow = `
-                                <tr class="member-details-${topicId}" style="display: none;">
-                                    <td colspan="5">
-                                        <div class="list-group mx-4 my-2">
-                                            ${topicMembers.map(member => `
-                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                        <span><i class="fas fa-user-circle me-2"></i>${member.name}</span>
-                                                        <button class="btn btn-outline-success btn-sm">
-                                                            <i class="fas fa-check me-1"></i>Duyệt
-                                                        </button>
+            <tr class="member-details-${topicId}" style="display: none;">
+                <td colspan="5">
+                    <div class="list-group mx-4 my-2">
+                        ${topicMembers.map(member => `
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <span class="h6">
+                                                        <i class="fas fa-user-circle me-2"></i>
+                                                        ${member.name}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-info me-2">
+                                                        GPA: ${member.gpa}
+                                                    </span>
+                                                    <span class="badge bg-secondary">
+                                                        GPA kỳ trước: ${member.last_gpa}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-md-4">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body p-2 text-center">
+                                                            <div class="small text-muted mb-1">Môn học 1</div>
+                                                            <div class="h5 mb-0 ${member.subject_1_mark >= 7 ? 'text-success' : (member.subject_1_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                ${member.subject_1_mark}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                `).join('')}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body p-2 text-center">
+                                                            <div class="small text-muted mb-1">Môn học 2</div>
+                                                            <div class="h5 mb-0 ${member.subject_2_mark >= 7 ? 'text-success' : (member.subject_2_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                ${member.subject_2_mark}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body p-2 text-center">
+                                                            <div class="small text-muted mb-1">Môn học 3</div>
+                                                            <div class="h5 mb-0 ${member.subject_3_mark >= 7 ? 'text-success' : (member.subject_3_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                ${member.subject_3_mark}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            `;
+                                    `).join('')}
+                    </div>
+                </td>
+            </tr>
+        `;
 
-                            // Thêm vào bảng
                             $('#topicsTable tbody').append(topicRow);
                             $('#topicsTable tbody').append(memberDetailsRow);
                         });
 
-                        // Cập nhật trạng thái nút
                         $('#btnArrange').prop('disabled', false).text('Sắp xếp lại chủ đề');
                     },
                     error: function() {
                         alert('Đã xảy ra lỗi khi sắp xếp nhóm.');
                         $('#btnArrange').prop('disabled', false).text('Sắp xếp lại chủ đề');
+                    },
+                    complete: function() {
+                        $("#cover-spin").hide();
                     }
                 });
             });
