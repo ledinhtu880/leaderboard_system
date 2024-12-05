@@ -32,5 +32,5 @@ Route::middleware('checkLogin')->group(function () {
 
     // User Route
     Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('user/topics', [HomeController::class, 'userTopic'])->name('user.topics');
+    Route::get('member/topics', [HomeController::class, 'memberTopic'])->name('member.topics');
 });

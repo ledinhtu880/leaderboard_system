@@ -30,32 +30,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('user.topics') }}"
+                    <a href="{{ route('member.topics') }}"
                         class="nav-link{{ Str::startsWith(request()->url(), url('/user/topics')) ? ' active' : '' }}">
                         <i class="nav-icon fas fa-book"></i>
                         <p>Chọn đề tài</p>
                     </a>
                 </li>
                 @if (session('role') == 'admin')
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('clusterView') }}"
-                            class="nav-link{{ Str::startsWith(request()->url(), url('/cluster')) ? ' active' : '' }}">
-                            <i class="nav-icon fas fa-list"></i>
-                            <p>Danh sách chủ đề</p>
-                        </a>
-                    </li> --}}
                     <li class="nav-item">
                         <a href="{{ route('admin.topics') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/admin/topics')) ? ' active' : '' }}">
                             <i class="nav-icon fas fa-tasks"></i>
                             <p>Danh sách đề tài</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.groups') }}"
-                            class="nav-link{{ Str::startsWith(request()->url(), url('/admin/groups')) ? ' active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Danh sách nhóm</p>
                         </a>
                     </li>
                     <li class="nav-item">

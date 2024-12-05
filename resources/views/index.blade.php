@@ -19,7 +19,7 @@
     <div class="row mx-3">
         <div class="col-md-3 mb-3">
             <div class="menu-item bg-info rounded shadow">
-                <a href="{{ route('user.topics') }}" class="menu-link">
+                <a href="{{ route('member.topics') }}" class="menu-link">
                     <i class="menu-icon fas fa-book fa-2x"></i>
                     <span class="menu-text">Chọn đề tài</span>
                 </a>

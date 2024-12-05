@@ -11,7 +11,7 @@ def connect_database():
         host="localhost",
         user="root",
         password="",
-        database="cluster"
+        database="cluster_backup"
     )
 
 def fetch_members():
@@ -100,63 +100,64 @@ def prepare_data(members):
         print(f"Error preparing data: {str(e)}")
         return None
     
-def distribute_to_topics(members, n_topics=4, max_members_per_topic=5):
+def distribute_to_topics(members, max_members_per_topic=5):
     try:
-        features = prepare_data(members)
-        if features is None:
-            raise Exception("Error preparing features")
+        # Kết nối database để lấy danh sách topic
+        conn = connect_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, description, name FROM topics")
+        topics = cursor.fetchall()
+        cursor.close()
+        conn.close()
         
-        # Tính điểm trung bình tổng thể
-        overall_average = np.mean(features)
+        # Khởi tạo các nhóm trống
+        topic_groups = {topic['id']: [] for topic in topics}
+        topic_descriptions = {topic['id']: topic['description'] for topic in topics}
+        topic_names = {topic['id']: topic['name'] for topic in topics}
         
-        # Phân loại các thành viên theo topic ban đầu
-        topic_groups = defaultdict(list)
-        topic_descriptions = {}  # Thêm dictionary để lưu description của từng topic
-        topic_names = {}
-
+        # Phân loại thành viên theo topic
+        overflow_members = []  # Thành viên dư thừa
         for member in members:
             topic_id = member['topic_id']
-            topic_groups[topic_id].append(member)
-            if topic_id not in topic_descriptions:
-                topic_descriptions[topic_id] = member.get('description')
-            if topic_id not in topic_names:
-                topic_names[topic_id] = member.get('topic_name')
-
-        # Kiểm tra và xử lý các topic vượt quá số lượng
-        overflow_members = []
-        for topic_id, group in topic_groups.items():
-            if len(group) > max_members_per_topic:
-                overflow_members.extend(group[max_members_per_topic:])
-                topic_groups[topic_id] = group[:max_members_per_topic]
+            if topic_id is not None and topic_id in topic_groups:
+                topic_groups[topic_id].append(member)
+            else:
+                overflow_members.append(member)  # Thành viên chưa chọn topic
         
-        # Phân phối lại thành viên từ nhóm dư thừa
+        # Xử lý các nhóm quá tải
+        for topic_id, group in list(topic_groups.items()):
+            if len(group) > max_members_per_topic:
+                overflow_members.extend(group[max_members_per_topic:])  # Thành viên dư thừa
+                topic_groups[topic_id] = group[:max_members_per_topic]  # Giữ lại tối đa `max_members_per_topic` thành viên
+        
+        # Tính điểm trung bình cho toàn cụm
+        overall_avg = np.mean([prepare_data([m])[0] for m in members])
+
+        # Phân phối lại thành viên dư thừa vào các nhóm còn chỗ trống
         for member in overflow_members:
             best_topic = None
-            smallest_difference = float('inf')
+            smallest_diff = float('inf')
+            
             for topic_id, group in topic_groups.items():
-                if len(group) < max_members_per_topic:
-                    # Tính điểm trung bình hiện tại của nhóm
-                    current_avg = np.mean([prepare_data([m])[0] for m in group])
-                    # Dự đoán điểm trung bình nếu thêm member
+                if len(group) < max_members_per_topic:  # Chỉ chọn các nhóm còn chỗ trống
+                    current_avg = np.mean([prepare_data([m])[0] for m in group]) if group else overall_avg
                     new_avg = (current_avg * len(group) + prepare_data([member])[0]) / (len(group) + 1)
-                    # Tính sự chênh lệch
-                    difference = abs(new_avg - overall_average)
-                    if difference < smallest_difference:
+                    diff = abs(new_avg - overall_avg)
+                    
+                    # Chọn nhóm có sự thay đổi điểm trung bình nhỏ nhất
+                    if diff < smallest_diff:
                         best_topic = topic_id
-                        smallest_difference = difference
-            # Thêm thành viên vào nhóm tốt nhất
+                        smallest_diff = diff
+            
+            # Phân bổ thành viên vào nhóm tốt nhất
             if best_topic is not None:
                 topic_groups[best_topic].append(member)
         
-        # Kiểm tra kết quả cuối cùng
-        for topic_id, group in topic_groups.items():
-            if len(group) > max_members_per_topic:
-                raise Exception(f"Topic {topic_id} has more members than allowed")
-        
-        return topic_groups, topic_descriptions , topic_names 
+        return topic_groups, topic_descriptions, topic_names
     except Exception as e:
         print(f"Error distributing topics: {str(e)}")
-        return None, None
+        return None, None, None
+
 
 def calculate_topic_averages(topic_groups):
     """Tính điểm trung bình cho mỗi topic và toàn cụm"""

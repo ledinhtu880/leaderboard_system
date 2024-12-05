@@ -34,6 +34,6 @@ class HomeController extends Controller
         $user = Auth::user();
         $topics = Topic::all();
         $selectedTopic = DB::table('member_topics')->where('member_id', $user->member->id)->value('topic_id');
-        return view('user.topic', compact('topics', 'selectedTopic'));
+        return view('member.topic', compact('topics', 'selectedTopic'));
     }
 }
