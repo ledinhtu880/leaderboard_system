@@ -25,11 +25,13 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('checkLogin')->group(function () {
     // Admin Route
-    Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('admin/groups', [HomeController::class, 'groupManagement'])->name('admin.groups');
-    Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
-    Route::get('admin/topics', [HomeController::class, 'topicManagement'])->name('admin.topics');
+    Route::middleware(['checkPermission'])->group(function () {
+        Route::get('admin/groups', [HomeController::class, 'groupManagement'])->name('admin.groups');
+        Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
+        Route::get('admin/topics', [HomeController::class, 'topicManagement'])->name('admin.topics');
+    });
 
     // User Route
+    Route::get('', [HomeController::class, 'index'])->name('home');
     Route::get('user/topics', [HomeController::class, 'userTopic'])->name('user.topics');
 });

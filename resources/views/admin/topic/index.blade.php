@@ -45,7 +45,7 @@
                                     <td class="fw-bold text-primary"
                                         style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         title="{{ $topic->name }}">
-                                        Nhóm {{ $topic->id }}: {{ $topic->name }}
+                                        {{ $topic->name }}
                                     </td>
                                     <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                                         title="{{ $topic->description }}">
@@ -62,7 +62,8 @@
                                     <td colspan="5">
                                         <div class="list-group mx-4 my-2">
                                             @foreach ($topic->members as $memberTopic)
-                                                <div class="list-group-item">
+                                                <div class="list-group-item"
+                                                    data-member-id="{{ $memberTopic->member->id }}">
                                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                                         <div>
                                                             <span class="h6">
@@ -148,13 +149,11 @@
                     url: "/api/run_clustering",
                     method: 'POST',
                     success: function(response) {
-                        console.log(response);
                         $('#topicsTable tbody').empty();
 
                         Object.keys(response.topic_groups).forEach(function(topicId) {
                             const topicData = response.topic_groups[topicId];
                             const topicMembers = topicData.members;
-                            console.log(topicMembers);
 
                             const topicRow = `
             <tr class="align-middle">
@@ -181,57 +180,57 @@
                 <td colspan="5">
                     <div class="list-group mx-4 my-2">
                         ${topicMembers.map(member => `
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <div>
-                                                    <span class="h6">
-                                                        <i class="fas fa-user-circle me-2"></i>
-                                                        ${member.name}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span class="badge bg-info me-2">
-                                                        GPA: ${member.gpa}
-                                                    </span>
-                                                    <span class="badge bg-secondary">
-                                                        GPA kỳ trước: ${member.last_gpa}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="row g-3">
-                                                <div class="col-md-4">
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-body p-2 text-center">
-                                                            <div class="small text-muted mb-1">Môn học 1</div>
-                                                            <div class="h5 mb-0 ${member.subject_1_mark >= 7 ? 'text-success' : (member.subject_1_mark >= 5 ? 'text-warning' : 'text-danger')}">
-                                                                ${member.subject_1_mark}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-body p-2 text-center">
-                                                            <div class="small text-muted mb-1">Môn học 2</div>
-                                                            <div class="h5 mb-0 ${member.subject_2_mark >= 7 ? 'text-success' : (member.subject_2_mark >= 5 ? 'text-warning' : 'text-danger')}">
-                                                                ${member.subject_2_mark}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-body p-2 text-center">
-                                                            <div class="small text-muted mb-1">Môn học 3</div>
-                                                            <div class="h5 mb-0 ${member.subject_3_mark >= 7 ? 'text-success' : (member.subject_3_mark >= 5 ? 'text-warning' : 'text-danger')}">
-                                                                ${member.subject_3_mark}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `).join('')}
+                                                                                                                                                <div class="list-group-item" data-member-id=${member.id}>
+                                                                                                                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                                                                                                        <div>
+                                                                                                                                                            <span class="h6">
+                                                                                                                                                                <i class="fas fa-user-circle me-2"></i>
+                                                                                                                                                                ${member.name}
+                                                                                                                                                            </span>
+                                                                                                                                                        </div>
+                                                                                                                                                        <div>
+                                                                                                                                                            <span class="badge bg-info me-2">
+                                                                                                                                                                GPA: ${member.gpa}
+                                                                                                                                                            </span>
+                                                                                                                                                            <span class="badge bg-secondary">
+                                                                                                                                                                GPA kỳ trước: ${member.last_gpa}
+                                                                                                                                                            </span>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div>
+                                                                                                                                                    <div class="row g-3">
+                                                                                                                                                        <div class="col-md-4">
+                                                                                                                                                            <div class="card border-0 bg-light">
+                                                                                                                                                                <div class="card-body p-2 text-center">
+                                                                                                                                                                    <div class="small text-muted mb-1">Môn học 1</div>
+                                                                                                                                                                    <div class="h5 mb-0 ${member.subject_1_mark >= 7 ? 'text-success' : (member.subject_1_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                                                                                                                        ${member.subject_1_mark}
+                                                                                                                                                                    </div>
+                                                                                                                                                                </div>
+                                                                                                                                                            </div>
+                                                                                                                                                        </div>
+                                                                                                                                                        <div class="col-md-4">
+                                                                                                                                                            <div class="card border-0 bg-light">
+                                                                                                                                                                <div class="card-body p-2 text-center">
+                                                                                                                                                                    <div class="small text-muted mb-1">Môn học 2</div>
+                                                                                                                                                                    <div class="h5 mb-0 ${member.subject_2_mark >= 7 ? 'text-success' : (member.subject_2_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                                                                                                                        ${member.subject_2_mark}
+                                                                                                                                                                    </div>
+                                                                                                                                                                </div>
+                                                                                                                                                            </div>
+                                                                                                                                                        </div>
+                                                                                                                                                        <div class="col-md-4">
+                                                                                                                                                            <div class="card border-0 bg-light">
+                                                                                                                                                                <div class="card-body p-2 text-center">
+                                                                                                                                                                    <div class="small text-muted mb-1">Môn học 3</div>
+                                                                                                                                                                    <div class="h5 mb-0 ${member.subject_3_mark >= 7 ? 'text-success' : (member.subject_3_mark >= 5 ? 'text-warning' : 'text-danger')}">
+                                                                                                                                                                        ${member.subject_3_mark}
+                                                                                                                                                                    </div>
+                                                                                                                                                                </div>
+                                                                                                                                                            </div>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div>
+                                                                                                                                                </div>
+                                                                                                                                            `).join('')}
                     </div>
                 </td>
             </tr>
@@ -258,6 +257,41 @@
                 const topicId = $(this).data('topic');
                 $(this).toggleClass('fa-plus-circle fa-minus-circle');
                 $(`.member-details-${topicId}`).toggle();
+            });
+
+            $('#btnSave').on('click', function() {
+                const topicGroups = {};
+
+                // Collect topic data from current table state
+                $('#topicsTable tbody tr.align-middle').each(function() {
+                    const topicId = $(this).find('.expand-details').data('topic');
+
+                    const members = [];
+                    $(`.member-details-${topicId} .list-group-item`).each(function() {
+                        const memberId = $(this).data('member-id');
+                        members.push(memberId);
+                    });
+
+                    topicGroups[topicId] = {
+                        members: members
+                    };
+                });
+
+                $.ajax({
+                    url: '/api/update_topics', // Your endpoint
+                    type: 'POST',
+                    data: {
+                        topic_groups: topicGroups,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        showToast(response.message, response.status);
+                    },
+                    error: function(xhr) {
+                        alert("Đã có lỗi xảy ra trong quá trình lưu nhóm!");
+                        console.log(xhr.responseText);
+                    }
+                });
             });
         });
     </script>

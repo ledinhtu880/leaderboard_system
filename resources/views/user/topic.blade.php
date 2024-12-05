@@ -44,6 +44,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
+                <input type="hidden" id="username" value="{{ session('username') }}">
                 @foreach ($topics as $each)
                     <div class="col-md-6 mb-4">
                         <div class="card topic-card shadow-sm rounded {{ $selectedTopic && $selectedTopic == $each->id ? ' selected' : '' }}"
@@ -87,13 +88,14 @@
                 var topicId = selectedTopic.data('topic-id');
 
                 $.ajax({
-                    url: '/api/store-topics',
+                    url: '/api/store_topics',
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
                         topic_id: topicId,
+                        username: $("#username").val(),
                     },
                     success: function(response) {
                         if (response.success) {

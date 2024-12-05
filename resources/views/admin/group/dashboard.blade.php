@@ -238,7 +238,7 @@
                 });
 
                 $.ajax({
-                    url: '/api/update-groups',
+                    url: '/api/update_groups',
                     method: 'POST',
                     data: JSON.stringify(groupData),
                     contentType: 'application/json',
