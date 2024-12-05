@@ -83,7 +83,7 @@
             }
 
             const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
-            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
+            const passwordPattern = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
 
             $('#username').on('input', function() {
                 hideError($(this).next());
@@ -132,7 +132,7 @@
                 }
 
                 if (!passwordPattern.test(password)) {
-                    showError(errorElement, 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số');
+                    showError(errorElement, 'Tên đăng nhập phải từ 6-20 ký tự và chỉ chứa chữ cái hoặc số');
                     return false;
                 }
 

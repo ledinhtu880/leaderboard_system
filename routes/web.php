@@ -20,18 +20,16 @@ use App\Http\Controllers\TopicController;
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::get('register', [AuthController::class, 'register'])->name('register');
 Route::post('handleRegister', [AuthController::class, 'handleRegister'])->name('handleRegister');
-Route::post('login', [AuthController::class, 'checklogin'])->name('checkLogin');
+Route::post('login', [AuthController::class, 'checkLogin'])->name('checkLogin');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('checklogin')->group(function () {
+Route::middleware('checkLogin')->group(function () {
+    // Admin Route
     Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('cluster/', [GroupController::class, 'clusterView'])->name('clusterView');
-    Route::get('run_cluster', [GroupController::class, 'runCluster'])->name('run_cluster');
-    Route::get('admin/groups/', [GroupController::class, 'groupDashboard'])->name('groupDashboard');
-    Route::get('admin/users/', [GroupController::class, 'userDashboard'])->name('userDashboard');
+    Route::get('admin/groups', [HomeController::class, 'groupManagement'])->name('admin.groups');
+    Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
+    Route::get('admin/topics', [HomeController::class, 'topicManagement'])->name('admin.topics');
 
-    Route::get('user/topics', [TopicController::class, 'userTopic'])->name('user.topics');
-    Route::post('user/topics/store', [TopicController::class, 'userStore'])->name('user.topics.store');
-
-    Route::get('admin/topics', [TopicController::class, 'adminTopic'])->name('admin.topics');
+    // User Route
+    Route::get('user/topics', [HomeController::class, 'userTopic'])->name('user.topics');
 });

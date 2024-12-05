@@ -31,7 +31,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Trang chủ</a></li>
                         <li class="breadcrumb-item active">Chọn đề tài</li>
                     </ol>
                 </div>
@@ -87,7 +87,7 @@
                 var topicId = selectedTopic.data('topic-id');
 
                 $.ajax({
-                    url: '/user/topics/store',
+                    url: '/api/store-topics',
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

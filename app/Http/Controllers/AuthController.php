@@ -43,6 +43,8 @@ class AuthController extends Controller
                 DB::beginTransaction();
                 $bearerToken = $this->getAccessToken($username, $password);
                 $studentData = $this->getStudentData($bearerToken);
+                $listMarkData = $this->getMarkData($bearerToken);
+                $subjectMarks = $this->getSubjectMarks($listMarkData);
 
                 $user = User::create([
                     'username' => $username,
@@ -53,18 +55,69 @@ class AuthController extends Controller
                     'name' => $studentData['student']['displayName'],
                     'gpa' => $studentData['learningMark'],
                     'last_gpa' => $this->getLastGpa($studentData),
-                    'final_score' => 8,
-                    'personality' => 0,
-                    'hobby' => 'Chơi game',
+                    'subject_1_mark' => $subjectMarks[0],
+                    'subject_2_mark' => $subjectMarks[1],
+                    'subject_3_mark' => $subjectMarks[2],
                 ]);
 
                 DB::commit();
-                return response()->json(['status' => 'success', 'message' => 'Đăng ký thành công', 'data' => $studentData]);
+                $res = redirect()->route('login')
+                    ->with('type', 'success')
+                    ->with('message', 'Đăng ký thành công');
+                return response()->json([
+                    'status' => 'success',
+                    'url' => $res->getTargetUrl(),
+                ]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['status' => 'danger', 'message' => $e->getMessage()]);
+                return response()->json([
+                    'status' => 'danger',
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
+    }
+    protected function getMarkData(string $bearerToken): array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $bearerToken
+        ])->get('http://sinhvien1.tlu.edu.vn/education/api/studentsubjectmark/getListMarkDetailStudent');
+
+        if (!$response->successful()) {
+            throw new Exception('Không thể lấy thông tin người dùng');
+        }
+
+        return $response->json();
+    }
+    protected function getSubjectMarks(array $data)
+    {
+        $studentCode = $data[0]['student']['studentCode'];
+
+        $graduationYear = substr($studentCode, 0, 2);
+        $subjectMappings = [
+            '21' => ['CSE405', 'CSE406', 'CSE392'], // K63
+            '22' => ['CSE492', 'CSE485', 'CSE480'], // K64
+        ];
+
+        $subjectMarks = [null, null, null];
+
+        if (isset($subjectMappings[$graduationYear])) {
+            foreach ($subjectMappings[$graduationYear] as $index => $expectedSubjectCode) {
+                $foundMark = null;
+                foreach ($data as $item) {
+
+                    if ($item['subject']['subjectCode'] === $expectedSubjectCode) {
+                        $foundMark = $item['mark'];
+                        break;
+                    }
+                }
+
+                $subjectMarks[$index] = $foundMark;
+            }
+        }
+
+        return $subjectMarks;
     }
     protected function getAccessToken(string $username, string $password): string
     {
@@ -108,14 +161,13 @@ class AuthController extends Controller
         }
         return 0;
     }
-
-    public function checklogin(Request $request)
+    public function checkLogin(Request $request)
     {
         $user = User::where('Username', $request->username)->first();
         if (empty($user)) {
             return redirect()->back()->withInput()->with('type', 'warning')->with('message', "Tài khoản chưa tồn tại, vui lòng đăng ký");
         }
-        if ($user && /* Hash::check($request->password, $user->password) */ $request->password == $user->password) {
+        if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
             $name = $user->member->name;
             $username = $user->username;

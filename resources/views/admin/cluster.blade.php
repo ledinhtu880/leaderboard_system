@@ -32,7 +32,7 @@
                 $('#groupsContainer').empty();
 
                 $.ajax({
-                    url: '/run_cluster',
+                    url: '/api/run_clustering',
                     method: 'GET',
                     success: function(response) {
                         $("#cover-spin").hide();

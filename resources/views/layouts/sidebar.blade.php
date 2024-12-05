@@ -15,7 +15,6 @@
             <div class="info">
                 <a href="#" class="d-flex flex-column">
                     <strong>{{ session('name') }}</strong>
-                    <small>{{ session('role') }}</small>
                 </a>
             </div>
         </div>
@@ -38,22 +37,29 @@
                     </a>
                 </li>
                 @if (session('role') == 'admin')
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('clusterView') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/cluster')) ? ' active' : '' }}">
                             <i class="nav-icon fas fa-list"></i>
                             <p>Danh sách chủ đề</p>
                         </a>
+                    </li> --}}
+                    <li class="nav-item">
+                        <a href="{{ route('admin.topics') }}"
+                            class="nav-link{{ Str::startsWith(request()->url(), url('/admin/topics')) ? ' active' : '' }}">
+                            <i class="nav-icon fas fa-tasks"></i>
+                            <p>Danh sách đề tài</p>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('groupDashboard') }}"
+                        <a href="{{ route('admin.groups') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/admin/groups')) ? ' active' : '' }}">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Danh sách nhóm</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('userDashboard') }}"
+                        <a href="{{ route('admin.members') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/admin/users')) ? ' active' : '' }}">
                             <i class="nav-icon fas fa-user-friends"></i>
                             <p>Danh sách thành viên</p>

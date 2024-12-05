@@ -16,11 +16,17 @@ class Member extends Model
         'name',
         'gpa',
         'last_gpa',
+        'subject_1_mark',
+        'subject_2_mark',
+        'subject_3_mark',
     ];
 
     protected $casts = [
         'gpa' => 'float',
         'last_gpa' => 'float',
+        'subject_1_mark' => 'float',
+        'subject_2_mark' => 'float',
+        'subject_3_mark' => 'float',
     ];
 
     public function groupMemberships()
