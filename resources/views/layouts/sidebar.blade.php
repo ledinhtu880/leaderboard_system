@@ -29,21 +29,7 @@
                         <p>Trang chủ</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('member.topics') }}"
-                        class="nav-link{{ Str::startsWith(request()->url(), url('/user/topics')) ? ' active' : '' }}">
-                        <i class="nav-icon fas fa-book"></i>
-                        <p>Chọn đề tài</p>
-                    </a>
-                </li>
                 @if (session('role') == 'admin')
-                    <li class="nav-item">
-                        <a href="{{ route('admin.topics') }}"
-                            class="nav-link{{ Str::startsWith(request()->url(), url('/admin/topics')) ? ' active' : '' }}">
-                            <i class="nav-icon fas fa-tasks"></i>
-                            <p>Danh sách đề tài</p>
-                        </a>
-                    </li>
                     <li class="nav-item">
                         <a href="{{ route('admin.members') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/admin/users')) ? ' active' : '' }}">

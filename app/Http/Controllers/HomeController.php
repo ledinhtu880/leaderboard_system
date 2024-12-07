@@ -16,24 +16,12 @@ class HomeController extends Controller
     }
 
     // - Hàm liên quan đến quản trị viên
-    public function memberManagement(Request $request)
+    public function memberManagement()
     {
         $members = Member::all();
         return view('admin.member.dashboard', compact('members'));
     }
-    public function topicManagement()
-    {
-        $topics = Topic::with('members.member')->get();
-        $members = Member::all();
-        return view('admin.topic.index', compact('topics', 'members'));
-    }
 
     // - Hàm liên quan đến người dùng
-    public function userTopic()
-    {
-        $user = Auth::user();
-        $topics = Topic::all();
-        $selectedTopic = DB::table('member_topics')->where('member_id', $user->member->id)->value('topic_id');
-        return view('member.topic', compact('topics', 'selectedTopic'));
-    }
+    public function memberProfile() {}
 }

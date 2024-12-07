@@ -25,10 +25,9 @@ Route::middleware('checkLogin')->group(function () {
     // Admin Route
     Route::middleware(['checkPermission'])->group(function () {
         Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
-        Route::get('admin/topics', [HomeController::class, 'topicManagement'])->name('admin.topics');
     });
 
     // User Route
     Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('member/topics', [HomeController::class, 'memberTopic'])->name('member.topics');
+    Route::get('member/profile', [HomeController::class, 'memberProfile'])->name('member.profile');
 });

@@ -17,23 +17,7 @@
 
     <!-- Main content -->
     <div class="row mx-3">
-        <div class="col-md-3 mb-3">
-            <div class="menu-item bg-info rounded shadow">
-                <a href="{{ route('member.topics') }}" class="menu-link">
-                    <i class="menu-icon fas fa-book fa-2x"></i>
-                    <span class="menu-text">Chọn đề tài</span>
-                </a>
-            </div>
-        </div>
         @if (session('role') == 'admin')
-            <div class="col-md-3 mb-3">
-                <div class="menu-item bg-info rounded shadow">
-                    <a href="{{ route('admin.topics') }}" class="menu-link">
-                        <i class="menu-icon fas fa-tasks fa-2x"></i>
-                        <span class="menu-text">Danh sách đề tài</span>
-                    </a>
-                </div>
-            </div>
             <div class="col-md-3 mb-3">
                 <div class="menu-item bg-info rounded shadow">
                     <a href="{{ route('admin.members') }}" class="menu-link">
