@@ -18,9 +18,7 @@ use App\Http\Controllers\TopicController;
 */
 
 Route::get('login', [AuthController::class, 'login'])->name('login');
-Route::get('register', [AuthController::class, 'register'])->name('register');
-Route::post('handleRegister', [AuthController::class, 'handleRegister'])->name('handleRegister');
-Route::post('login', [AuthController::class, 'checkLogin'])->name('checkLogin');
+Route::post('checkLogin', [AuthController::class, 'checkLogin'])->name('checkLogin');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('checkLogin')->group(function () {
