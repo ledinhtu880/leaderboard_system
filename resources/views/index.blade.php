@@ -27,6 +27,22 @@
                 </div>
             </div>
         @endif
+        <div class="col-md-3 mb-3">
+            <div class="menu-item bg-info rounded shadow">
+                <a href="{{ route('member.profile') }}" class="menu-link">
+                    <i class="menu-icon fas fa-calendar fa-2x"></i>
+                    <span class="menu-text">Lịch học</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="menu-item bg-info rounded shadow">
+                <a href="{{ route('member.attendance') }}" class="menu-link">
+                    <i class="menu-icon fas fa-check-to-slot fa-2x"></i>
+                    <span class="menu-text">Điểm danh</span>
+                </a>
+            </div>
+        </div>
     </div>
     <!-- /.content -->
 @endsection

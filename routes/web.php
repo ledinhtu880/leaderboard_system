@@ -30,4 +30,6 @@ Route::middleware('checkLogin')->group(function () {
     // User Route
     Route::get('', [HomeController::class, 'index'])->name('home');
     Route::get('member/profile', [HomeController::class, 'memberProfile'])->name('member.profile');
+    Route::get('member/calendar', [HomeController::class, 'memberCalendar'])->name('member.calendar');
+    Route::get('member/attendance', [HomeController::class, 'memberAttendance'])->name('member.attendance');
 });

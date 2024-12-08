@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\HelperController;
+use App\Models\Subject;
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -20,34 +22,6 @@ class AuthController extends Controller
             return view('login');
         }
     }
-    protected function getAccessToken(string $username, string $password): string
-    {
-        $response = Http::post('http://sinhvien1.tlu.edu.vn/education/oauth/token', [
-            'username' => $username,
-            'password' => $password,
-            'client_id' => 'education_client',
-            'client_secret' => 'password',
-            'grant_type' => 'password',
-        ]);
-
-        if (!$response->successful()) {
-            throw new Exception('Mã sinh viên hoặc mật khẩu không chính xác');
-        }
-
-        return $response->json('access_token');
-    }
-    protected function getStudentData(string $bearerToken): array
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $bearerToken
-        ])->get('http://sinhvien1.tlu.edu.vn/education/api/studentsummarymark/getbystudent');
-
-        if (!$response->successful()) {
-            throw new Exception('Không thể lấy thông tin người dùng');
-        }
-
-        return $response->json();
-    }
     public function checkLogin(Request $request)
     {
         $username = $request->username;
@@ -57,8 +31,18 @@ class AuthController extends Controller
 
         if (!$user) {
             try {
-                $bearerToken = $this->getAccessToken($username, $password);
-                $studentData = $this->getStudentData($bearerToken);
+                DB::beginTransaction();
+                $bearerToken = HelperController::getAccessToken($username, $password);
+                $studentData = HelperController::getStudentData($bearerToken);
+
+                // Kiểm tra xem môn học CSE414 đã tồn tại chưa
+                $subject = Subject::where('subject_code', 'CSE414')->first();
+
+                // Chỉ gọi saveSubjectData nếu môn học chưa tồn tại
+                if (!$subject) {
+                    HelperController::saveSubjectData($bearerToken);
+                    $subject = Subject::where('subject_code', 'CSE414')->first();
+                }
 
                 $user = User::create([
                     'username' => $username,
@@ -68,14 +52,25 @@ class AuthController extends Controller
                 $birthdate = \DateTime::createFromFormat('d/m/Y', $studentData['student']['birthDateString'])
                     ->format('Y-m-d');
 
-                $user->member()->create([
+                $member = $user->member()->create([
                     'name' => $studentData['student']['displayName'],
                     'phone' => $studentData['student']['phoneNumber'],
                     'birthdate' => $birthdate,
                     'email' => $studentData['student']['user']['email'],
                     'class' => $studentData['student']['enrollmentClass']['className'],
                 ]);
+
+                // Tạo bản ghi member_schedules
+                $schedules = Schedule::where('subject_id', $subject->id)->get();
+                foreach ($schedules as $schedule) {
+                    $member->memberSchedules()->create([
+                        'schedule_id' => $schedule->id
+                    ]);
+                }
+
+                DB::commit();
             } catch (Exception $e) {
+                DB::rollBack();
                 return response()->json([
                     'status' => 'danger',
                     'message' => $e->getMessage(),
@@ -106,7 +101,6 @@ class AuthController extends Controller
                 ->with('message', 'Mã sinh viên hoặc mật khẩu không chính xác');
         }
     }
-
     public function logout()
     {
         Auth::logout();

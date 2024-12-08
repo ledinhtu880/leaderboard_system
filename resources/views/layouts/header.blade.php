@@ -14,14 +14,15 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <button class="dropdown-item d-flex align-items-center justify-content-between">
+                    <a href="{{ route('member.profile') }}"
+                        class="dropdown-item d-flex align-items-center justify-content-between">
                         <div class="rounded-circle d-flex align-items-center justify-content-center mr-2"
                             style="width: 24px; height: 24px; background-color: #e5e5e5 !important;">
                             <i class="fas fa-user text-muted" style="font-size: 14px;"></i>
                         </div>
                         <span class="flex-grow-1">Tài khoản</span>
                         <i class="fas fa-chevron-right ml-2"></i>
-                    </button>
+                    </a>
                 </li>
                 <li>
                     <a href="{{ route('logout') }}"

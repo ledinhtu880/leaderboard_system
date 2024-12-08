@@ -38,6 +38,13 @@
                         </a>
                     </li>
                 @endif
+                <li class="nav-item">
+                    <a href="{{ route('member.calendar') }}"
+                        class="nav-link{{ Str::startsWith(request()->url(), url('/member/calendar')) ? ' active' : '' }}">
+                        <i class="nav-icon fas fa-calendar"></i>
+                        <p>Lịch học</p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

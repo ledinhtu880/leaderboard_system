@@ -46,4 +46,12 @@ class Member extends Model
 
         return $result ? $result->first_character : null;
     }
+    public function getBirthdateAttribute(): string
+    {
+        return date('d/m/Y', strtotime($this->attributes['birthdate']));
+    }
+    public function memberSchedules()
+    {
+        return $this->hasMany(MemberSchedule::class);
+    }
 }

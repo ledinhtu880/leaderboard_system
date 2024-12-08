@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use App\Models\MemberSchedule;
 use App\Models\Member;
-use App\Models\Topic;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -23,5 +24,24 @@ class HomeController extends Controller
     }
 
     // - Hàm liên quan đến người dùng
-    public function memberProfile() {}
+    public function memberProfile()
+    {
+        $user = Auth::user();
+        $member = Member::where('user_id', $user->id)->first();
+        return view('member.profile', compact('member'));
+    }
+    public function memberCalendar()
+    {
+        $memberId = auth()->user()->member->id;
+        $schedules = MemberSchedule::where('member_id', $memberId)
+            ->with(['schedule' => function ($query) {
+                $query->with(['subject', 'teacher', 'room']);
+            }])
+            ->get();
+        return view('member.calendar', compact('schedules'));
+    }
+    public function memberAttendance()
+    {
+        return view('member.attendance');
+    }
 }
