@@ -73,7 +73,7 @@
                 columnHeaderFormat: 'dddd',
                 titleFormat: 'D/MM/YYYY',
                 events: events,
-                locale: 'vi',
+                locale: 'h',
             });
         });
     </script>

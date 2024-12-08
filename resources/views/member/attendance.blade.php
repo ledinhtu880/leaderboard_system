@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Trang chủ')
+@section('title', 'Điểm danh')
 
 @section('content')
     <!-- Content header -->
@@ -58,6 +58,3 @@
     </section>
     <!-- /.content -->
 @endsection
-
-@push('js')
-@endpush

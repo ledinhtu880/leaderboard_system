@@ -29,7 +29,28 @@
                         <p>Trang chủ</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('member.calendar') }}"
+                        class="nav-link{{ Str::startsWith(request()->url(), url('/member/calendar')) ? ' active' : '' }}">
+                        <i class="nav-icon fas fa-calendar"></i>
+                        <p>Lịch học</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('member.attendance') }}"
+                        class="nav-link{{ Str::startsWith(request()->url(), url('/member/attendance')) ? ' active' : '' }}">
+                        <i class="nav-icon fas fa-check-to-slot"></i>
+                        <p>Điểm danh</p>
+                    </a>
+                </li>
                 @if (session('role') == 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.attendances') }}"
+                            class="nav-link{{ Str::startsWith(request()->url(), url('/admin/attendances')) ? ' active' : '' }}">
+                            <i class="nav-icon fas fa-list-check"></i>
+                            <p>Tạo phiên điểm danh</p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('admin.members') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/admin/users')) ? ' active' : '' }}">
@@ -38,13 +59,6 @@
                         </a>
                     </li>
                 @endif
-                <li class="nav-item">
-                    <a href="{{ route('member.calendar') }}"
-                        class="nav-link{{ Str::startsWith(request()->url(), url('/member/calendar')) ? ' active' : '' }}">
-                        <i class="nav-icon fas fa-calendar"></i>
-                        <p>Lịch học</p>
-                    </a>
-                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

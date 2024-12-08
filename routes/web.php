@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceSessionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GroupController;
@@ -25,6 +26,7 @@ Route::middleware('checkLogin')->group(function () {
     // Admin Route
     Route::middleware(['checkPermission'])->group(function () {
         Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
+        Route::get('admin/attendances', [AttendanceSessionController::class, 'index'])->name('admin.attendances');
     });
 
     // User Route

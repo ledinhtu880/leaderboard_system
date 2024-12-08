@@ -19,3 +19,6 @@ use App\Http\Controllers\GroupController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('get-lessons', [ApiController::class, 'getLessons']);
+Route::post('store-session', [ApiController::class, 'storeAttendanceSession']);

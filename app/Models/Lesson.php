@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Lesson extends Model
 {
@@ -32,18 +33,28 @@ class Lesson extends Model
     // Quan hệ với Subject thông qua Schedule
     public function subject()
     {
-        return $this->through('schedule')->has('subject');
+        return $this->hasOneThrough(
+            Subject::class,  // Model cuối cùng
+            Schedule::class, // Model trung gian
+            'id',            // Khóa chính trong bảng Schedule
+            'id',            // Khóa chính trong bảng Subject
+            'schedule_id',   // Khóa ngoại trong bảng Lesson trỏ đến Schedule
+            'subject_id'     // Khóa ngoại trong bảng Schedule trỏ đến Subject
+        );
     }
-
-    // Quan hệ với Room thông qua Schedule
-    public function room()
-    {
-        return $this->through('schedule')->has('room');
-    }
-
-    // Quan hệ với Teacher thông qua Schedule
     public function teacher()
     {
-        return $this->through('schedule')->has('teacher');
+        return $this->hasOneThrough(
+            Teacher::class,
+            Schedule::class,
+            'id',
+            'id',
+            'schedule_id',
+            'teacher_id'
+        );
+    }
+    public function getLessonDateAttribute()
+    {
+        return Carbon::parse($this->attributes['lesson_date'])->format('d/m/Y');
     }
 }
