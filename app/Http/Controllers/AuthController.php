@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\HelperController;
-use App\Models\Subject;
-use App\Models\Schedule;
-use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Models\CourseRegistration;
+use App\Models\Subject;
+use App\Models\User;
+use Exception;
 
 class AuthController extends Controller
 {
     public function login()
     {
-        if (Auth::check()) {
+        if (Session::has("username") && Session::has("name")) {
             return redirect()->intended('');
         } else {
             return view('login');
@@ -60,13 +61,10 @@ class AuthController extends Controller
                     'class' => $studentData['student']['enrollmentClass']['className'],
                 ]);
 
-                // Tạo bản ghi member_schedules
-                $schedules = Schedule::where('subject_id', $subject->id)->get();
-                foreach ($schedules as $schedule) {
-                    $member->memberSchedules()->create([
-                        'schedule_id' => $schedule->id
-                    ]);
-                }
+                CourseRegistration::create([
+                    'member_id' => $member->id,
+                    'subject_id' => $subject->id,
+                ]);
 
                 DB::commit();
             } catch (Exception $e) {
@@ -95,10 +93,7 @@ class AuthController extends Controller
                     ->with('message', 'Đăng nhập thành công')->getTargetUrl(),
             ]);
         } else {
-            return redirect()->back()
-                ->withInput()
-                ->with('type', 'warning')
-                ->with('message', 'Mã sinh viên hoặc mật khẩu không chính xác');
+            return response()->json(['status' => 'warning', 'message' => 'Mã sinh viên hoặc mật khẩu không chính xác']);
         }
     }
     public function logout()

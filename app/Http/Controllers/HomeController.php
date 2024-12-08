@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use App\Models\MemberSchedule;
 use App\Models\Member;
-use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -30,15 +27,42 @@ class HomeController extends Controller
         $member = Member::where('user_id', $user->id)->first();
         return view('member.profile', compact('member'));
     }
+    /* public function memberCalendar()
+    {
+        $memberId = auth()->user()->member->id;
+        $lessons = CourseRegistration::where('member_id', $memberId)
+            ->with([
+                'subject',
+                'subject.schedules',
+                'subject.schedules.teacher',
+                'subject.schedules.room'
+            ])->get();
+        return view('member.calendar', compact('lessons'));
+    } */
     public function memberCalendar()
     {
         $memberId = auth()->user()->member->id;
-        $schedules = MemberSchedule::where('member_id', $memberId)
-            ->with(['schedule' => function ($query) {
-                $query->with(['subject', 'teacher', 'room']);
-            }])
+        /* $courseRegistrationIds = CourseRegistration::where('member_id', $memberId)->pluck('id');
+        // Thay đổi câu truy vấn ở đây
+        $lessons = Lesson::whereIn('schedule_id', $courseRegistrationIds)  // Thay 'whereHas' bằng 'whereIn'
+            ->with([
+                'schedule',
+                'schedule.subject',
+                'schedule.room'
+            ])
             ->get();
-        return view('member.calendar', compact('schedules'));
+        dd($lessons); */
+        $lessons = DB::table('lessons AS l')
+            ->join('schedules AS s', 'l.schedule_id', '=', 's.id')
+            ->join('subjects AS sj', 's.subject_id', '=', 'sj.id')
+            ->join('rooms AS r', 's.room_id', '=', 'r.id')
+            ->join('course_registrations AS cr', 'sj.id', '=', 'cr.subject_id')
+            ->join('members AS m', 'cr.member_id', '=', 'm.id')
+            ->where('m.id', $memberId)
+            ->select('sj.subject_name', 'r.name as room_name', 'l.lesson_date', 'l.start_time', 'l.end_time', 'l.week_index')
+            ->get();
+
+        return view('member.calendar', compact('lessons'));
     }
     public function memberAttendance()
     {

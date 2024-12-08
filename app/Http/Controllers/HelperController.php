@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
-use App\Models\Room;
-use App\Models\Teacher;
-use App\Models\Subject;
-use App\Models\Schedule;
-use App\Models\CourseSubject;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use App\Models\Schedule;
+use App\Models\Subject;
+use App\Models\Teacher;
+use App\Models\Lesson;
+use App\Models\Room;
+use Carbon\Carbon;
 use Exception;
 
 class HelperController extends Controller
@@ -42,59 +43,56 @@ class HelperController extends Controller
 
         return $response->json();
     }
-
+    public static function convertTimestampToDateTime($timestamp): string
+    {
+        return $timestamp ? date('Y-m-d H:i:s', $timestamp / 1000) : null;
+    }
     public static function saveSubjectData(string $bearerToken)
     {
         try {
             DB::beginTransaction();
             $subjectData = HelperController::processSubjectData($bearerToken);
 
-            // Lưu thông tin môn học
             $subject = Subject::updateOrCreate(
                 ['subject_code' => $subjectData['subject']['subject_code']],
                 [
                     'subject_name' => $subjectData['subject']['subject_name'],
-                    'subject_name_eng' => $subjectData['subject']['subject_name_eng'],
-                    'number_of_credits' => $subjectData['subject']['number_of_credits']
                 ]
             );
 
-            // Lưu thông tin khóa học
-            $courseSubject = CourseSubject::create([
-                'subject_id' => $subject->id,
-                'display_name' => $subjectData['course_subject']['display_name'],
-                'course_year_code' => $subjectData['course_subject']['course_year_code'],
-                'status' => $subjectData['course_subject']['status']
-            ]);
-
-            // Lưu thông tin lịch học
             foreach ($subjectData['timetables'] as $timetable) {
-                // Lưu giảng viên
                 $teacher = Teacher::updateOrCreate(
                     ['display_name' => $timetable['teacher']['displayName']]
                 );
 
-                // Lưu phòng học
                 $room = Room::updateOrCreate(
                     ['name' => $timetable['room']['name']]
                 );
-
-                // Lưu thông tin lịch học
-                Schedule::create([
-                    'course_subject_id' => $courseSubject->id,
+                $schedule = Schedule::create([
                     'subject_id' => $subject->id,
                     'teacher_id' => $teacher->id,
                     'room_id' => $room->id,
-                    'start_hour_name' => $timetable['startHour']['name'],
-                    'start_hour_string' => $timetable['startHour']['startString'],
-                    'end_hour_name' => $timetable['endHour']['name'],
-                    'end_hour_string' => $timetable['endHour']['endString'],
                     'week_index' => $timetable['weekIndex'],
-                    'from_week' => $timetable['fromWeek'],
-                    'to_week' => $timetable['toWeek'],
-                    'start_date' => HelperController::convertTimestampToDateTime($timetable['startDate']),
-                    'end_date' => HelperController::convertTimestampToDateTime($timetable['endDate'])
+                    'start_week' => $timetable['fromWeek'],
+                    'end_week' => $timetable['toWeek'],
                 ]);
+
+                $startDate = Carbon::parse(HelperController::convertTimestampToDateTime($timetable['startDate']));
+                $endDate = Carbon::parse(HelperController::convertTimestampToDateTime($timetable['endDate']));
+
+                $currentDate = $startDate->copy();
+                while ($currentDate <= $endDate) {
+                    $lessonDate = $currentDate->copy()->startOfWeek()->addDays($schedule->week_index == 3 ? 1 : 4);
+
+                    Lesson::create([
+                        'schedule_id' => $schedule->id,
+                        'lesson_date' => $lessonDate->format('Y-m-d'),
+                        'week_index' => $schedule->week_index,
+                        'start_time' => $timetable['startHour']['startString'],
+                        'end_time' => $timetable['endHour']['endString'],
+                    ]);
+                    $currentDate->addWeek();
+                }
             }
 
             DB::commit();
@@ -141,9 +139,5 @@ class HelperController extends Controller
             ],
             'timetables' => $targetSubject['courseSubject']['timetables']
         ];
-    }
-    public static function convertTimestampToDateTime($timestamp): string
-    {
-        return $timestamp ? date('Y-m-d H:i:s', $timestamp / 1000) : null;
     }
 }

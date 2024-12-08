@@ -50,8 +50,4 @@ class Member extends Model
     {
         return date('d/m/Y', strtotime($this->attributes['birthdate']));
     }
-    public function memberSchedules()
-    {
-        return $this->hasMany(MemberSchedule::class);
-    }
 }

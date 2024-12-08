@@ -9,26 +9,15 @@ class Schedule extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'course_subject_id',
         'subject_id',
         'teacher_id',
         'room_id',
-        'start_hour_name',
-        'start_hour_string',
-        'end_hour_name',
-        'end_hour_string',
+        'start_week',
+        'end_week',
         'week_index',
-        'from_week',
-        'to_week',
-        'start_date',
-        'end_date'
     ];
 
     // Quan hệ với Subject
-    public function courseSubject()
-    {
-        return $this->belongsTo(CourseSubject::class, 'course_subject_id', 'id');
-    }
 
     public function subject()
     {
@@ -51,13 +40,4 @@ class Schedule extends Model
         'start_date',
         'end_date'
     ];
-    public function members()
-    {
-        return $this->belongsToMany(
-            Member::class,
-            'member_schedules',
-            'schedule_id',
-            'member_id'
-        )->withPivot('registered_at');
-    }
 }

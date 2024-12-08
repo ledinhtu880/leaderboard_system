@@ -50,13 +50,12 @@
     <script>
         $(document).ready(function() {
             var events = [
-                @foreach ($schedules as $memberSchedule)
+                @foreach ($lessons as $lesson)
                     {
-                        title: '{{ $memberSchedule->schedule->subject->subject_name }} \n {{ $memberSchedule->schedule->room->name }}',
-                        start: '{{ $memberSchedule->schedule->start_hour_string }}',
-                        end: '{{ $memberSchedule->schedule->end_hour_string }}',
-                        room: '{{ $memberSchedule->schedule->room->name }}',
-                        dow: [{{ $memberSchedule->schedule->week_index == 3 ? 2 : 5 }}]
+                        title: '{{ $lesson->subject_name }} \n {{ $lesson->room_name }}',
+                        start: '{{ $lesson->lesson_date }} {{ $lesson->start_time }}',
+                        end: '{{ $lesson->lesson_date }} {{ $lesson->end_time }}',
+                        dow: [{{ $lesson->week_index == 3 ? 2 : 5 }}]
                     },
                 @endforeach
             ];
@@ -75,10 +74,6 @@
                 titleFormat: 'D/MM/YYYY',
                 events: events,
                 locale: 'vi',
-                validRange: {
-                    start: '2024-11-11', // Ngày bắt đầu hiển thị
-                    end: '2025-01-05' // Ngày kết thúc hiển thị
-                },
             });
         });
     </script>
