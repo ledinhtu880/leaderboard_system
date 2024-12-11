@@ -17,9 +17,27 @@
 
     <!-- Main content -->
     <div class="row mx-3">
+        @if (session('role') == 'admin')
+            <div class="col-md-3 mb-3">
+                <div class="menu-item bg-info rounded shadow">
+                    <a href="#" class="menu-link">
+                        <i class="menu-icon fas fa-user-friends fa-2x"></i>
+                        <span class="menu-text">Quản lý thành viên</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="menu-item bg-info rounded shadow">
+                    <a href="#" class="menu-link">
+                        <i class="menu-icon fas fa-ranking-star fa-2x"></i>
+                        <span class="menu-text">Bảng xếp hạng</span>
+                    </a>
+                </div>
+            </div>
+        @endif
         <div class="col-md-3 mb-3">
             <div class="menu-item bg-info rounded shadow">
-                <a href="{{ route('member.profile') }}" class="menu-link">
+                <a href="{{ route('member.calendar') }}" class="menu-link">
                     <i class="menu-icon fas fa-calendar fa-2x"></i>
                     <span class="menu-text">Lịch học</span>
                 </a>
@@ -39,14 +57,6 @@
                     <a href="{{ route('admin.attendances') }}" class="menu-link">
                         <i class="menu-icon fas fa-list-check fa-2x"></i>
                         <span class="menu-text">Tạo phiên điểm danh</span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="menu-item bg-info rounded shadow">
-                    <a href="{{ route('admin.members') }}" class="menu-link">
-                        <i class="menu-icon fas fa-user-friends fa-2x"></i>
-                        <span class="menu-text">Danh sách thành viên</span>
                     </a>
                 </div>
             </div>

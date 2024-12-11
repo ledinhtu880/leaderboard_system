@@ -25,7 +25,6 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('checkLogin')->group(function () {
     // Admin Route
     Route::middleware(['checkPermission'])->group(function () {
-        Route::get('admin/members', [HomeController::class, 'memberManagement'])->name('admin.members');
         Route::get('admin/attendances', [AttendanceSessionController::class, 'index'])->name('admin.attendances');
     });
 

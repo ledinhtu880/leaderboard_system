@@ -37,16 +37,41 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Chọn môn học</label>
-                                    <select class="form-control" id="lesson_id" required>
-                                        <option value="">Chọn môn học</option>
+                                    <label>Chọn môn học</label>
+                                    <select class="form-control" id="subject_id" required>
+                                        <option selected disabled hidden>Chọn môn học</option>
+                                        @foreach ($subjects as $each)
+                                            <option value="{{ $each->id }}">
+                                                {{ $each->subject_code }} - {{ $each->subject_name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Chọn buổi học</label>
+                                    <select class="form-control" id="lesson_id" required>
+                                        <option selected disabled hidden>Chọn buổi học</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label>Giáo viên</label>
                                     <input type="text" class="form-control" id="teacher_id" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="use_password">
+                                        Sử dụng mật khẩu cho phiên điểm danh
+                                    </label>
+                                    <input type="text" class="form-control" id="attendance_password"
+                                        placeholder="Nhập mật khẩu" disabled>
                                 </div>
                             </div>
                         </div>
@@ -61,18 +86,6 @@
                                 <div class="form-group">
                                     <label>Thời gian kết thúc</label>
                                     <input type="text" class="form-control datetimepicker" id="end_time" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>
-                                        <input type="checkbox" id="use_password">
-                                        Sử dụng mật khẩu cho phiên điểm danh
-                                    </label>
-                                    <input type="text" class="form-control" id="attendance_password"
-                                        placeholder="Nhập mật khẩu" disabled>
                                 </div>
                             </div>
                         </div>
@@ -95,59 +108,58 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         $(document).ready(function() {
-            // Khởi tạo flatpickr cho start_time và end_time
             $(".datetimepicker").flatpickr({
                 enableTime: true,
                 noCalendar: true,
-                dateFormat: "H:i", // Hiển thị giờ và phút
+                dateFormat: "H:i",
                 time_24hr: true,
                 minuteIncrement: 1,
                 onChange: function(selectedDates, dateStr, instance) {
-                    // Khi thay đổi start_time, cập nhật end_time
                     if (instance.input.id === "start_time") {
                         updateEndTime(dateStr);
                     }
                 }
             });
 
-            loadLessonsAndTeachers();
-
-            function loadLessonsAndTeachers() {
+            $("#subject_id").on("change", function() {
                 $.ajax({
-                    url: '/api/get-lessons', // Endpoint API của bạn
-                    method: 'GET',
-                    success: function(data) {
-                        $('#lesson_id').html('<option value="">Chọn môn học</option>');
-                        data.lessons.forEach(function(lesson) {
-                            $('#lesson_id').append(`
-                                        <option value="${lesson.id}">
-                                            ${lesson.subject.subject_name} - ${lesson.lesson_date}
-                                        </option>
-                                    `);
+                    url: '/api/get-lesson-by-subject',
+                    method: 'POST',
+                    data: {
+                        subject_id: $("#subject_id").val()
+                    },
+                    success: function(response) {
+                        let i = 0;
+                        $('#lesson_id').html(
+                            '<<option selected disabled hidden>Chọn buổi học</option>');
+                        response.forEach(function(element) {
+                            let startTime = element.start_time.substring(0, 5);
+                            let endTime = element.end_time.substring(0, 5);
+
+                            $('#lesson_id').append(
+                                `<option value="${element.id}">Buổi học ngày ${element.lesson_date}: ${startTime} => ${endTime}</option>`
+                            );
                         });
 
-                        // Sự kiện chọn môn học
                         $('#lesson_id').change(function() {
-                            const selectedLesson = data.lessons.find(
+                            const selectedLesson = response.find(
                                 lesson => lesson.id == $(this).val()
                             );
 
                             if (selectedLesson) {
-                                $("#lesson_id").data("lesson_date", selectedLesson.lesson_date);
-                                $('#teacher_id').val(selectedLesson.teacher.display_name);
-                                $("#teacher_id").data("teacher_id", selectedLesson.teacher.id);
+                                $('#teacher_id').val(selectedLesson.teacher
+                                    .display_name);
+                                $("#lesson_id").data("lesson_date", selectedLesson
+                                    .lesson_date);
+                                $("#teacher_id").data("teacher_id", selectedLesson
+                                    .teacher.id);
 
-                                // Lấy lesson_date và start_time của Lesson
-                                const lessonDate = selectedLesson
-                                    .lesson_date; // Định dạng dd/mm/yyyy
-                                const lessonStartTime = selectedLesson
-                                    .start_time; // Định dạng HH:mm:ss
+                                const lessonDate = selectedLesson.lesson_date;
+                                const lessonStartTime = selectedLesson.start_time;
 
-                                // Chuyển đổi lesson_date từ dd/mm/yyyy thành yyyy-mm-dd
                                 const formattedDate = convertDateToISOFormat(
                                     lessonDate); // yyyy-mm-dd
 
-                                // Kiểm tra xem lessonStartTime có hợp lệ không
                                 if (!lessonStartTime || lessonStartTime.length !== 8) {
                                     alert("Invalid start time format.");
                                     return;
@@ -157,34 +169,33 @@
                                     `${formattedDate}T${lessonStartTime}`);
                                 startTime.setMinutes(startTime.getMinutes() - 5);
 
-                                // Định dạng lại giờ phút
-                                const formattedStartTime = startTime.toTimeString().slice(0, 5);
+                                const formattedStartTime = startTime.toTimeString()
+                                    .slice(0, 5);
 
-                                // Gán vào ô "thời gian bắt đầu"
                                 $('#start_time').val(formattedStartTime);
 
-                                // Cập nhật end_time là 10 phút sau start_time
                                 updateEndTime(formattedStartTime);
                             }
                         });
+                    },
+                    error: function(xhr) {
+                        alert("Có lỗi xảy ra");
+                        console.log(xhr.responseText);
                     }
                 });
-            }
+            });
 
-            // Hàm chuyển đổi định dạng dd/mm/yyyy thành yyyy-mm-dd
             function convertDateToISOFormat(dateStr) {
                 const parts = dateStr.split('/');
-                return `${parts[2]}-${parts[1]}-${parts[0]}`; // yyyy-mm-dd
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
             }
 
-            // Hàm cập nhật end_time
             function updateEndTime(startTime) {
-                const start = new Date(`1970-01-01T${startTime}:00`); // Thêm ":00" để có giây
-                start.setMinutes(start.getMinutes() + 10); // Thêm 10 phút
+                const start = new Date(`1970-01-01T${startTime}:00`);
+                start.setMinutes(start.getMinutes() + 10);
 
-                const formattedEndTime = start.toTimeString().slice(0, 5); // Định dạng HH:mm
+                const formattedEndTime = start.toTimeString().slice(0, 5);
 
-                // Cập nhật vào input end_time
                 $('#end_time').val(formattedEndTime);
             }
             $("#use_password").change(function() {
@@ -193,7 +204,6 @@
                     $("#attendance_password").val('');
                 }
             });
-            // Gửi form mở phiên điểm danh
             $('#attendanceSessionForm').on("submit", function(e) {
                 e.preventDefault();
 

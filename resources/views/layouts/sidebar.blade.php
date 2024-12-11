@@ -51,13 +51,6 @@
                             <p>Tạo phiên điểm danh</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.members') }}"
-                            class="nav-link{{ Str::startsWith(request()->url(), url('/admin/users')) ? ' active' : '' }}">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>Danh sách thành viên</p>
-                        </a>
-                    </li>
                 @endif
             </ul>
         </nav>

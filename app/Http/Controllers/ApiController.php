@@ -11,14 +11,19 @@ use Carbon\Carbon;
 
 class ApiController extends Controller
 {
-    public function getLessons()
+    public function getLessonBySubject(Request $request)
     {
-        $today = Carbon::today(); // Lấy ngày hiện tại (không tính giờ)
-
-        $data = Lesson::with('subject', 'teacher') // Tải kèm quan hệ
-            ->where('lesson_date', '>', $today)   // Chỉ lấy các lesson có lessonDate sau hôm nay
-            ->get();
-        return response()->json(data: ['lessons' => $data]);
+        if ($request->ajax()) {
+            $subject_id = $request->input('subject_id');
+            $today = Carbon::today(); // Lấy ngày hiện tại (không tính giờ)
+            $lessons = Lesson::whereHas('schedule', function ($query) use ($subject_id) {
+                $query->where('subject_id', $subject_id);
+            })
+                ->with('subject', 'teacher') // Lấy các thông tin liên quan
+                ->where('lesson_date', '>', $today)   // Chỉ lấy các lesson có lessonDate sau hôm nay
+                ->get();
+            return response()->json($lessons);
+        }
     }
     public function storeAttendanceSession(Request $request)
     {

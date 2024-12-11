@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperController;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\CourseRegistration;
@@ -17,10 +18,10 @@ class AuthController extends Controller
 {
     public function login()
     {
-        if (Session::has("username") && Session::has("name")) {
+        if (Auth::check()) {
             return redirect()->intended('');
         } else {
-            return view('login');
+            return view('auth.login');
         }
     }
     public function checkLogin(Request $request)
@@ -36,15 +37,6 @@ class AuthController extends Controller
                 $bearerToken = HelperController::getAccessToken($username, $password);
                 $studentData = HelperController::getStudentData($bearerToken);
 
-                // Kiểm tra xem môn học CSE414 đã tồn tại chưa
-                $subject = Subject::where('subject_code', 'CSE414')->first();
-
-                // Chỉ gọi saveSubjectData nếu môn học chưa tồn tại
-                if (!$subject) {
-                    HelperController::saveSubjectData($bearerToken);
-                    $subject = Subject::where('subject_code', 'CSE414')->first();
-                }
-
                 $user = User::create([
                     'username' => $username,
                     'password' => $password
@@ -59,16 +51,29 @@ class AuthController extends Controller
                     'birthdate' => $birthdate,
                     'email' => $studentData['student']['user']['email'],
                     'class' => $studentData['student']['enrollmentClass']['className'],
+                    'gpa' => $studentData['learningMark'],
                 ]);
 
-                CourseRegistration::create([
-                    'member_id' => $member->id,
-                    'subject_id' => $subject->id,
-                ]);
+                // Kiểm tra xem môn học CSE414 đã tồn tại chưa
+                $subject = Subject::where('subject_code', 'CSE414')->exists();
+
+                // Chỉ gọi saveSubjectData nếu môn học chưa tồn tại
+                if ($subject == false) {
+                    HelperController::saveSubjectData($bearerToken);
+                    $subject = Subject::where('subject_code', 'CSE414')->first();
+
+                    Log::info($member);
+                    Log::info($subject);
+                    CourseRegistration::create([
+                        'member_id' => $member->id,
+                        'subject_id' => $subject->id,
+                    ]);
+                }
 
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
+                Log::error($e->getMessage());
                 return response()->json([
                     'status' => 'danger',
                     'message' => $e->getMessage(),

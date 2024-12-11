@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Schedule;
 use App\Models\Subject;
@@ -87,7 +88,6 @@ class HelperController extends Controller
                     Lesson::create([
                         'schedule_id' => $schedule->id,
                         'lesson_date' => $lessonDate->format('Y-m-d'),
-                        'week_index' => $schedule->week_index,
                         'start_time' => $timetable['startHour']['startString'],
                         'end_time' => $timetable['endHour']['endString'],
                     ]);
@@ -99,6 +99,7 @@ class HelperController extends Controller
             return response()->json(['message' => 'Lưu dữ liệu môn học thành công']);
         } catch (Exception $e) {
             DB::rollBack();
+            Log::info($e->getMessage());
             return response()->json([
                 'message' => 'Lỗi khi lưu dữ liệu môn học',
                 'error' => $e->getMessage()
