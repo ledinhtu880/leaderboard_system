@@ -1,11 +1,8 @@
 <?php
 
-use App\Http\Controllers\AttendanceSessionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TopicController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,16 +15,13 @@ use App\Http\Controllers\TopicController;
 |
 */
 
-Route::get('login', [AuthController::class, 'login'])->name('login');
+// Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('checkLogin', [AuthController::class, 'checkLogin'])->name('checkLogin');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('', [HomeController::class, 'leaderboard'])->name('leaderboard');
 Route::middleware('checkLogin')->group(function () {
-    // Admin Route
-    Route::middleware(['checkPermission'])->group(function () {});
-
     // User Route
-    Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('leaderboard', [HomeController::class, 'leaderboard'])->name('leaderboard');
+    Route::get('statistics', [HomeController::class, 'statistics'])->name('statistics');
     Route::get('profile', [HomeController::class, 'memberProfile'])->name('profile');
 });

@@ -4,9 +4,56 @@
 
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <style>
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: none;
+        }
+    </style>
 @endpush
 
 @section('content')
+    <!-- Modal -->
+    <div id="cover-spin"></div>
+    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="loginModalLabel">Đăng nhập</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label for="username" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
+                        <div class="error-message" id="username-error"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Nhập mật khẩu">
+                        <div class="error-message" id="password-error"></div>
+                    </div>
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                    <div class="d-grid">
+                        <button id="btnLogin" class="btn btn-info btn-gradient">Đăng nhập</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Content header -->
     <div class="content-header">
         <div class="container-fluid">
@@ -23,11 +70,11 @@
     <section class="content">
         <div class="container-fluid">
             <div class="card card-lightblue card-outline">
-                <div class="card-header">
+                {{-- <div class="card-header">
                     <h2 class="card-title text-bold" style="font-size: 24px">Bảng xếp hạng</h2>
-                </div>
+                </div> --}}
                 <div class="card-body">
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-4 mb-3 align-items-center justify-content-center d-flex">
                             <div class="card card-primary card-outline shadow">
                                 <div
@@ -145,7 +192,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="row">
                         <div class="col-md-12">
                             <div class="table-responsive">
@@ -162,7 +209,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($remainingMembers as $each)
+                                        @foreach ($members as $each)
                                             <tr>
                                                 <td class="text-center text-bold">{{ $each['ranking'] }}</td>
                                                 <td>{{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
@@ -196,7 +243,7 @@
                 scrollY: '400px',
                 scrollCollapse: true,
                 paging: false,
-                searching: false,
+                searching: true,
                 autoWidth: false,
                 responsive: true,
                 ordering: false, // Tắt sorting
@@ -210,6 +257,116 @@
                     table.columns.adjust().draw(false); // Cập nhật lại table
                 }, 0); // Đợi animation của sidebar kết thúc
             });
+
+
+            const message = '{{ session('message') }}';
+            const type = '{{ session('type') }}';
+
+            if (message && type) {
+                showToast(message, type);
+            }
+
+            const usernamePattern = /^[a-zA-Z0-9]{6,20}$/;
+            const passwordPattern = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
+
+            $('#username').on('input', function() {
+                hideError($(this).next());
+            });
+
+            $('#password').on('input', function() {
+                hideError($(this).next());
+            });
+
+            $('#loginModal').on('shown.bs.modal', function() {
+                $(document).on('keypress.login', function(e) {
+                    if (e.which == 13) {
+                        $('#btnLogin').click();
+                    }
+                });
+            });
+
+            // Remove event when modal hides
+            $('#loginModal').on('hidden.bs.modal', function() {
+                $(document).off('keypress.login');
+            });
+
+            $('#btnLogin').on('click', function(e) {
+                const isUsernameValid = validateUsername();
+                const isPasswordValid = validatePassword();
+
+                if (isUsernameValid && isPasswordValid) {
+                    $("#cover-spin").show();
+                    $.ajax({
+                        type: 'POST',
+                        url: "/checkLogin",
+                        data: {
+                            username: $('#username').val(),
+                            password: $('#password').val(),
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status == 'success') {
+                                window.location.href = response.url
+                            } else {
+                                showToast(response.message, response.status);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
+                            alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+                        },
+                        complete: function() {
+                            $("#cover-spin").hide();
+                        }
+                    });
+                }
+            });
+
+            function validateUsername() {
+                const username = $('#username').val();
+                const errorElement = $('#username-error');
+
+                if (!username) {
+                    showError(errorElement, 'Vui lòng nhập tên đăng nhập');
+                    return false;
+                }
+
+                if (!usernamePattern.test(username)) {
+                    showError(errorElement, 'Tên đăng nhập phải từ 6-20 ký tự và chỉ chứa chữ cái hoặc số');
+                    return false;
+                }
+
+                hideError(errorElement);
+                return true;
+            }
+
+            function validatePassword() {
+                const password = $('#password').val();
+                const errorElement = $('#password-error');
+
+                if (!password) {
+                    showError(errorElement, 'Vui lòng nhập mật khẩu');
+                    return false;
+                }
+
+                if (!passwordPattern.test(password)) {
+                    showError(errorElement, 'Tên đăng nhập phải từ 6-20 ký tự và chỉ chứa chữ cái hoặc số');
+                    return false;
+                }
+
+                hideError(errorElement);
+                return true;
+            }
+
+            function showError(element, message) {
+                element.text(message).show();
+                element.prev('input').addClass('is-invalid');
+            }
+
+            function hideError(element) {
+                element.hide();
+                element.prev('input').removeClass('is-invalid');
+            }
         });
     </script>
 @endpush

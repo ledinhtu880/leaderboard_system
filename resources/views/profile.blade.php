@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('leaderboard') }}">Bảng xếp hạng</a></li>
                         <li class="breadcrumb-item active">Xem thông tin</li>
                     </ol>
                 </div>

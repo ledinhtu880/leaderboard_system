@@ -13,19 +13,6 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <style>
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .form-control.is-invalid {
-            border-color: #dc3545;
-            background-image: none;
-        }
-    </style>
 </head>
 
 <body class="bg-light">
@@ -85,6 +72,12 @@
 
             $('#password').on('input', function() {
                 hideError($(this).next());
+            });
+
+            $(document).on('keypress', function(e) {
+                if (e.which == 13) { // Enter key
+                    $('#btnLogin').click();
+                }
             });
 
             $('#btnLogin').on('click', function(e) {

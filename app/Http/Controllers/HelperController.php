@@ -63,7 +63,7 @@ class HelperController extends Controller
 
         return $filteredData;
     }
-    public static function rankingStudent($data): array
+    /* public static function rankingStudent($data): array
     {
         usort($data, function ($a, $b) {
             if ($a['Điểm tổng'] != $b['Điểm tổng']) {
@@ -85,6 +85,60 @@ class HelperController extends Controller
             $member['ranking'] = $index + 1;
             return $member;
         }, array_keys($data), $data);
+        return $data;
+    } */
+    public static function rankingStudent($data): array
+    {
+        usort($data, function ($a, $b) {
+            if ($a['Điểm tổng'] != $b['Điểm tổng']) {
+                return $b['Điểm tổng'] <=> $a['Điểm tổng'];
+            }
+            if ($a['Điểm chuyên cần'] != $b['Điểm chuyên cần']) {
+                return $b['Điểm chuyên cần'] <=> $a['Điểm chuyên cần'];
+            }
+            if ($a['Điểm phát biểu'] != $b['Điểm phát biểu']) {
+                return $b['Điểm phát biểu'] <=> $a['Điểm phát biểu'];
+            }
+            return 0; // Equal ranking for tied scores
+        });
+
+        $rank = 1;
+        $prevScore = null;
+        $sameRankCount = 0;
+
+        $data = array_map(function ($member) use (&$rank, &$prevScore, &$sameRankCount) {
+            $currentScore = [
+                'total' => $member['Điểm tổng'],
+                'attendance' => $member['Điểm chuyên cần'],
+                'speech' => $member['Điểm phát biểu']
+            ];
+
+            if ($prevScore !== null) {
+                if (
+                    $currentScore['total'] === $prevScore['total'] &&
+                    $currentScore['attendance'] === $prevScore['attendance'] &&
+                    $currentScore['speech'] === $prevScore['speech']
+                ) {
+                    $sameRankCount++;
+                } else {
+                    // Next rank should be current rank + 1
+                    $rank = $rank + 1;
+                    $sameRankCount = 0;
+                }
+            }
+
+            $member['ranking'] = $rank;
+            $prevScore = $currentScore;
+            return $member;
+        }, $data);
+
+        usort($data, function ($a, $b) {
+            if ($a['ranking'] !== $b['ranking']) {
+                return $a['ranking'] - $b['ranking'];
+            }
+            return $a['STT'] - $b['STT'];
+        });
+
         return $data;
     }
     public static function getRankingById($msv)
