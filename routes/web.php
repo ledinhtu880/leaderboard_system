@@ -24,13 +24,10 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('checkLogin')->group(function () {
     // Admin Route
-    Route::middleware(['checkPermission'])->group(function () {
-        Route::get('admin/attendances', [AttendanceSessionController::class, 'index'])->name('admin.attendances');
-    });
+    Route::middleware(['checkPermission'])->group(function () {});
 
     // User Route
     Route::get('', [HomeController::class, 'index'])->name('home');
-    Route::get('member/profile', [HomeController::class, 'memberProfile'])->name('member.profile');
-    Route::get('member/calendar', [HomeController::class, 'memberCalendar'])->name('member.calendar');
-    Route::get('member/attendance', [HomeController::class, 'memberAttendance'])->name('member.attendance');
+    Route::get('leaderboard', [HomeController::class, 'leaderboard'])->name('leaderboard');
+    Route::get('profile', [HomeController::class, 'memberProfile'])->name('profile');
 });

@@ -84,114 +84,130 @@
                                 <span
                                     class="user-avatar user-avatar--lg img-circle elevation-2 text-white mb-3">{{ session('firstCharacter') }}</span>
                             </div>
-
                             <h3 class="profile-username text-center">{{ session('name') }}</h3>
-                            <p class="text-muted text-center">
-                                {{ $member->user->role == 'admin' ? 'Quản trị viên' : 'Thành viên' }}</p>
                             <ul class="list-group list-group-unbordered mb-3">
                                 <li class="list-group-item">
-                                    <b>Số điện thoại</b> <span class="float-right">{{ $member->phone }}</span>
+                                    <b><i class="fas fa-phone me-2"></i> Số điện thoại</b>
+                                    <span class="float-right">{{ $member->phone }}</span>
                                 </li>
                                 <li class="list-group-item">
-                                    <b>Email</b> <span class="float-right">{{ $member->email }}</span>
+                                    <b><i class="fas fa-envelope me-2"></i> Email</b>
+                                    <span class="float-right">{{ $member->email }}</span>
                                 </li>
                                 <li class="list-group-item">
-                                    <b>Ngày sinh</b> <span class="float-right">{{ $member->birth_date }}</span>
+                                    <b><i class="fas fa-calendar me-2"></i> Ngày sinh</b>
+                                    <span class="float-right">{{ $member->birthdate }}</span>
                                 </li>
                                 <li class="list-group-item">
-                                    <b>Lớp</b> <span class="float-right">{{ $member->class }}</span>
+                                    <b><i class="fas fa-users me-2"></i> Lớp</b>
+                                    <span class="float-right">{{ $member->class }}</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
                     <!-- /.profile image -->
                 </div>
-
                 <div class="col-md-9">
                     <!-- Card -->
                     <div class="card card-info card-outline">
                         <!-- Card body -->
                         <div class="card-body">
-                            {{-- <div class="row">
-                                <div class="col-md-4">
-                                    <div class="progress-group">
-                                        Số lần điểm danh
-                                        <span class="float-right"><b>5</b>/15</span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-primary" style="width: 33%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="progress-group">
-                                        Điểm Project
-                                        <span class="float-right"><b>7</b>/10</span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 70%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="progress-group">
-                                        Số lần xung phong
-                                        <span class="float-right"><b>3</b>/5</span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-warning" style="width: 60%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="progress-group text-center">
                                         <div class="circle-progress">
                                             <svg viewBox="0 0 36 36" class="circular-chart blue">
                                                 <path class="circle-background"
                                                     d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
-                                                <path class="circle-progress-bar" stroke-dasharray="33, 100"
+                                                <path class="circle-progress-bar"
+                                                    stroke-dasharray="{{ 33 * $member->{"Vắng"} }}, 100"
                                                     d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
                                             </svg>
                                             <div class="circle-content">
-                                                <b>5</b>/15
+                                                <b>{{ $member->{"Vắng"} }}</b>/3
                                             </div>
                                         </div>
-                                        <p class="mt-2">Số lần điểm danh</p>
+                                        <p class="mt-2">Số lần vắng</p>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="progress-group text-center">
                                         <div class="circle-progress">
                                             <svg viewBox="0 0 36 36" class="circular-chart green">
                                                 <path class="circle-background"
                                                     d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
-                                                <path class="circle-progress-bar" stroke-dasharray="70, 100"
+                                                <path class="circle-progress-bar"
+                                                    stroke-dasharray="{{ 20 * $member->{"Phát biểu"} }}, 100"
                                                     d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
                                             </svg>
                                             <div class="circle-content">
-                                                <b>7</b>/10
-                                            </div>
-                                        </div>
-                                        <p class="mt-2">Điểm Project</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="progress-group text-center">
-                                        <div class="circle-progress">
-                                            <svg viewBox="0 0 36 36" class="circular-chart yellow">
-                                                <path class="circle-background"
-                                                    d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
-                                                <path class="circle-progress-bar" stroke-dasharray="60, 100"
-                                                    d="M18 2 a16 16 0 1 1 0 32 a16 16 0 1 1 0 -32" />
-                                            </svg>
-                                            <div class="circle-content">
-                                                <b>3</b>/5
+                                                <b>{{ $member->{"Phát biểu"} }}</b>/5
                                             </div>
                                         </div>
                                         <p class="mt-2">Số lần xung phong</p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
 
+                    <!-- Card -->
+                    <div class="card card-info card-outline">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-olive"><i class="fas fa-user-clock"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Điểm chuyên cần</span>
+                                            <span class="info-box-number">{{ $member->{'Điểm chuyên cần'} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-teal"><i class="far fa-comment-dots"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Điểm phát biểu</span>
+                                            <span class="info-box-number">{{ $member->{"Điểm phát biểu"} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-success"><i class="fas fa-chart-bar"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Điểm tổng</span>
+                                            <span class="info-box-number">{{ $member->{"Điểm tổng"} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-lightblue"><i
+                                                class="fas fa-graduation-cap"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">GPA (Hệ 10)</span>
+                                            <span class="info-box-number"
+                                                style="font-size: 18px;">{{ $member->{"gpa"} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-primary"><i class="fas fa-medal"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Ranking</span>
+                                            <span class="info-box-number"
+                                                style="font-size: 18px;">{{ $member->{"ranking"} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>

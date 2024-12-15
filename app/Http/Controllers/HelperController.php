@@ -3,14 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use App\Models\Schedule;
-use App\Models\Subject;
-use App\Models\Teacher;
-use App\Models\Lesson;
-use App\Models\Room;
-use Carbon\Carbon;
 use Exception;
 
 class HelperController extends Controller
@@ -44,101 +36,83 @@ class HelperController extends Controller
 
         return $response->json();
     }
-    public static function convertTimestampToDateTime($timestamp): string
+    public static function getDataFromSuperset(): array
     {
-        return $timestamp ? date('Y-m-d H:i:s', $timestamp / 1000) : null;
-    }
-    public static function saveSubjectData(string $bearerToken)
-    {
-        try {
-            DB::beginTransaction();
-            $subjectData = HelperController::processSubjectData($bearerToken);
-
-            $subject = Subject::updateOrCreate(
-                ['subject_code' => $subjectData['subject']['subject_code']],
-                [
-                    'subject_name' => $subjectData['subject']['subject_name'],
-                ]
-            );
-
-            foreach ($subjectData['timetables'] as $timetable) {
-                $teacher = Teacher::updateOrCreate(
-                    ['display_name' => $timetable['teacher']['displayName']]
-                );
-
-                $room = Room::updateOrCreate(
-                    ['name' => $timetable['room']['name']]
-                );
-                $schedule = Schedule::create([
-                    'subject_id' => $subject->id,
-                    'teacher_id' => $teacher->id,
-                    'room_id' => $room->id,
-                    'week_index' => $timetable['weekIndex'],
-                    'start_week' => $timetable['fromWeek'],
-                    'end_week' => $timetable['toWeek'],
-                ]);
-
-                $startDate = Carbon::parse(HelperController::convertTimestampToDateTime($timetable['startDate']));
-                $endDate = Carbon::parse(HelperController::convertTimestampToDateTime($timetable['endDate']));
-
-                $currentDate = $startDate->copy();
-                while ($currentDate <= $endDate) {
-                    $lessonDate = $currentDate->copy()->startOfWeek()->addDays($schedule->week_index == 3 ? 1 : 4);
-
-                    Lesson::create([
-                        'schedule_id' => $schedule->id,
-                        'lesson_date' => $lessonDate->format('Y-m-d'),
-                        'start_time' => $timetable['startHour']['startString'],
-                        'end_time' => $timetable['endHour']['endString'],
-                    ]);
-                    $currentDate->addWeek();
-                }
-            }
-
-            DB::commit();
-            return response()->json(['message' => 'Lưu dữ liệu môn học thành công']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::info($e->getMessage());
-            return response()->json([
-                'message' => 'Lỗi khi lưu dữ liệu môn học',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-    public static function processSubjectData(string $bearerToken): array
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $bearerToken
-        ])->get('http://sinhvien1.tlu.edu.vn/education/api/StudentCourseSubject/studentLoginUser/11');
-
+        $response = Http::get('http://localhost:8088/api/v1/chart/231/data/');
         if (!$response->successful()) {
-            throw new Exception('Không thể lấy thông tin môn học');
+            throw new Exception($response->json('message'));
         }
 
-        $subjects = $response->json();
+        $data = $response->json();
 
-        $targetSubject = collect($subjects)->first(function ($subject) {
-            return $subject['courseSubject']['semesterSubject']['subject']['subjectCode'] === 'CSE414';
+        return $data["result"][0]["data"];
+    }
+    public static function getDataFromSheet(): array
+    {
+        $response = Http::get('https://sheetdb.io/api/v1/6kos5lsn1o82d');
+        if (!$response->successful()) {
+            throw new Exception($response->json('message'));
+        }
+
+        $data = $response->json();
+
+        // Filter out elements with NULL 'STT'
+        $filteredData = array_filter($data, function ($each) {
+            return !($each['STT'] == "");
         });
 
-        if (!$targetSubject) {
-            throw new Exception('Không tìm thấy môn học CSE414');
-        }
+        return $filteredData;
+    }
+    public static function rankingStudent($data): array
+    {
+        usort($data, function ($a, $b) {
+            if ($a['Điểm tổng'] != $b['Điểm tổng']) {
+                return $b['Điểm tổng'] <=> $a['Điểm tổng'];
+            }
+            if ($a['Điểm chuyên cần'] != $b['Điểm chuyên cần']) {
+                return $b['Điểm chuyên cần'] <=> $a['Điểm chuyên cần'];
+            }
+            if ($a['Điểm phát biểu'] != $b['Điểm phát biểu']) {
+                return $b['Điểm phát biểu'] <=> $a['Điểm phát biểu'];
+            }
+            if ($a['Tên'] != $b['Tên']) {
+                return strcmp($a['Tên'], $b['Tên']);
+            }
+            return strcmp($a['Họ'], $b['Họ']);
+        });
+
+        $data = array_map(function ($index, $member) {
+            $member['ranking'] = $index + 1;
+            return $member;
+        }, array_keys($data), $data);
+        return $data;
+    }
+    public static function getRankingById($msv)
+    {
+        $data = HelperController::getDataFromSuperset();
+        $members = HelperController::rankingStudent($data);
+        $student = array_filter($members, function ($each) use ($msv) {
+            return $each['Mã sinh viên'] == $msv;
+        });
+        $student = array_values($student)[0] ?? [];
+        return $student['ranking'];
+    }
+    public static function getMarkByStudentId($msv): array
+    {
+        $studentData = HelperController::getDataFromSuperset();
+        $student = array_filter($studentData, function ($each) use ($msv) {
+            return $each['Mã sinh viên'] == $msv;
+        });
+
+        $student = array_values($student)[0] ?? [];
 
         return [
-            'subject' => [
-                'subject_code' => $targetSubject['courseSubject']['semesterSubject']['subject']['subjectCode'],
-                'subject_name' => $targetSubject['courseSubject']['semesterSubject']['subject']['subjectName'],
-                'subject_name_eng' => $targetSubject['courseSubject']['semesterSubject']['subject']['subjectNameEng'],
-                'number_of_credits' => $targetSubject['numberOfCredit']
-            ],
-            'course_subject' => [
-                'display_name' => $targetSubject['courseSubject']['displayName'],
-                'course_year_code' => $targetSubject['courseSubject']['courseYearCode'],
-                'status' => $targetSubject['courseSubject']['status']
-            ],
-            'timetables' => $targetSubject['courseSubject']['timetables']
+            'Điểm chuyên cần' => $student['Điểm chuyên cần'],
+            'Điểm phát biểu' => $student['Điểm phát biểu'],
+            'Điểm tổng' => $student['Điểm tổng'],
+            'Phát biểu' => $student['Phát biểu'],
+            'Vắng' => $student['Vắng'],
+            'Điểm project' => $student['Điểm project'],
         ];
     }
 }

@@ -2,122 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use App\Models\AttendanceSession;
-use App\Models\Lesson;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class ApiController extends Controller
 {
-    public function getLessonBySubject(Request $request)
-    {
-        if ($request->ajax()) {
-            $subject_id = $request->input('subject_id');
-            $today = Carbon::today(); // Lấy ngày hiện tại (không tính giờ)
-            $lessons = Lesson::whereHas('schedule', function ($query) use ($subject_id) {
-                $query->where('subject_id', $subject_id);
-            })
-                ->with('subject', 'teacher') // Lấy các thông tin liên quan
-                ->where('lesson_date', '>', $today)   // Chỉ lấy các lesson có lessonDate sau hôm nay
-                ->get();
-            return response()->json($lessons);
-        }
-    }
-    public function storeAttendanceSession(Request $request)
-    {
-        $validatedData = $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'password' => 'nullable|string|max:255',
-            'teacher_id' => 'required|exists:teachers,id',
-        ]);
+    // public function fetchDataFromSuperset()
+    // {
+    //     $client = new \GuzzleHttp\Client([
+    //         'base_uri' => 'http://localhost:8088/api/v1/',
+    //         'timeout'  => 30.0,
+    //     ]);
 
-        try {
-            DB::beginTransaction();
+    //     try {
+    //         // Xác thực và lấy cookie session
+    //         $authResponse = $client->post('security/login', [
+    //             'json' => [
+    //                 'username' => 'admin',
+    //                 'password' => 'admin',
+    //                 'provider' => 'db',
+    //                 'refresh' => true,
+    //             ],
+    //             'http_errors' => false,
+    //         ]);
 
-            // Lấy bài học để lấy ngày
-            $lesson = Lesson::findOrFail($validatedData['lesson_id']);
+    //         $sessionCookie = $this->getSessionCookie($authResponse);
+    //         return response()->json($sessionCookie);
 
-            // Kiểm tra xem đã có phiên điểm danh mở cho bài học này chưa
-            $existingSession = AttendanceSession::where('lesson_id', $validatedData['lesson_id'])
-                ->where('is_open', true)
-                ->first();
+    //         // Lấy dữ liệu dashboard
+    //         $dashboardResponse = $client->get('dashboard/20/charts', [
+    //             'cookies' => $sessionCookie,
+    //             'http_errors' => false,
+    //         ]);
 
-            if ($existingSession) {
-                return response()->json([
-                    'status' => 'warning',
-                    'message' => 'Đã tồn tại phiên điểm danh đang mở cho bài học này'
-                ]);
-            }
+    //         $dashboardData = json_decode($dashboardResponse->getBody(), true);
 
-            $lessonDate = Carbon::parse($lesson->lesson_date)->format('Y-m-d');
-            $startDateTime = Carbon::createFromFormat('Y-m-d H:i', $lessonDate . ' ' . trim($validatedData['start_time']));
-            $endDateTime = Carbon::createFromFormat('Y-m-d H:i', $lessonDate . ' ' . trim($validatedData['end_time']));
-            $lessonStartTime = Carbon::createFromFormat('Y-m-d H:i:s', $lessonDate . ' ' . trim($lesson->start_time));
-            $lessonEndTime = Carbon::createFromFormat('Y-m-d H:i:s', $lessonDate . ' ' . trim($lesson->end_time));
+    //         return response()->json($dashboardData);
+    //     } catch (\Exception $e) {
+    //         Log::error('Superset API Error: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Could not fetch data'], 500);
+    //     }
+    // }
 
-            // Kiểm tra thời gian hợp lệ
-            if (
-                $startDateTime->lt($lessonStartTime->subMinutes(5)) ||
-                $endDateTime->gt($lessonEndTime)
-            ) {
-                return response()->json([
-                    'status' => 'warning',
-                    'message' => 'Thời gian phiên điểm danh không hợp lệ',
-                ]);
-            }
+    // /**
+    //  * Lấy cookie session từ response đăng nhập
+    //  *
+    //  * @param \Psr\Http\Message\ResponseInterface $response
+    //  * @return \GuzzleHttp\Cookie\CookieJar
+    //  */
+    // protected function getSessionCookie($response)
+    // {
+    //     $cookies = $response->getHeader('Set-Cookie');
+    //     return $cookies;
 
-            // Tạo phiên điểm danh mới
-            AttendanceSession::create([
-                'lesson_id' => $validatedData['lesson_id'],
-                'teacher_id' => $validatedData['teacher_id'],
-                'start_time' => $startDateTime,
-                'end_time' => $endDateTime,
-                'password' => $validatedData['password'] ? bcrypt($validatedData['password']) : null,
-                'is_open' => true
-            ]);
+    //     if (!empty($cookies)) {
+    //         $cookieJar = new \GuzzleHttp\Cookie\CookieJar();
+    //         foreach ($cookies as $cookie) {
+    //             $parts = explode(';', $cookie);
+    //             $cookieParts = explode('=', $parts[0]);
+    //             $cookieJar->setCookie(new \GuzzleHttp\Cookie\SetCookie([
+    //                 'Name' => $cookieParts[0],
+    //                 'Value' => $cookieParts[1],
+    //                 'Domain' => 'localhost',
+    //                 'Path' => '/',
+    //             ]));
+    //         }
+    //         return $cookieJar;
+    //     }
 
-            DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Tạo phiên điểm danh thành công',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Lỗi khi tạo phiên điểm danh',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-    public function closeAttendanceSession($sessionId)
-    {
-        try {
-            $session = AttendanceSession::findOrFail($sessionId);
-
-            // Chỉ cho phép đóng phiên đang mở
-            if (!$session->is_open) {
-                return response()->json([
-                    'message' => 'Phiên điểm danh đã được đóng'
-                ], 400);
-            }
-
-            $session->update([
-                'is_open' => false
-            ]);
-
-            return response()->json([
-                'message' => 'Đóng phiên điểm danh thành công'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Lỗi khi đóng phiên điểm danh',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //     return null;
+    // }
 }

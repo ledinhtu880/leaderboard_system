@@ -3,9 +3,6 @@
         <li class="nav-item" id="sidebar-toggle-button">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
-        {{-- <li class="nav-item d-none d-sm-inline-block">
-            <a href="{{ route('home') }}" class="nav-link">Trang chủ</a>
-        </li> --}}
     </ul>
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
@@ -14,7 +11,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a href="{{ route('member.profile') }}"
+                    <a href="{{ route('profile') }}"
                         class="dropdown-item d-flex align-items-center justify-content-between">
                         <div class="rounded-circle d-flex align-items-center justify-content-center mr-2"
                             style="width: 24px; height: 24px; background-color: #e5e5e5 !important;">

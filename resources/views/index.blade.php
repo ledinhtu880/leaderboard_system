@@ -2,13 +2,17 @@
 
 @section('title', 'Trang chủ')
 
+@push('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+@endpush
+
 @section('content')
     <!-- Content header -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Trang chủ</h1>
+                    <h1 class="m-0">Trang chủ</h1>
                 </div>
             </div>
         </div>
@@ -16,51 +20,134 @@
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <div class="row mx-3">
-        @if (session('role') == 'admin')
-            <div class="col-md-3 mb-3">
-                <div class="menu-item bg-info rounded shadow">
-                    <a href="#" class="menu-link">
-                        <i class="menu-icon fas fa-user-friends fa-2x"></i>
-                        <span class="menu-text">Quản lý thành viên</span>
-                    </a>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h2 class="card-title text-bold" style="font-size: 24px">Biểu đồ</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center flex-column">
+                                <iframe
+                                    src="http://localhost:8088/explore/?slice_id=232&form_data=%7B%22slice_id%22%3A%20232%7D&standalone=true"
+                                    height="300" frameborder="0"></iframe>
+                                <h6 class="mt-2">Biểu đồ thống kê tỷ lệ vắng</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center flex-column">
+                                <iframe
+                                    src="http://localhost:8088/explore/?slice_id=233&form_data=%7B%22slice_id%22%3A%20233%7D&standalone=true"
+                                    height="300" frameborder="0"></iframe>
+                                <h6 class="mt-2">Biểu đồ thống kê tỷ lệ phát biểu</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center justify-content-center flex-column">
+                                <iframe
+                                    src="http://localhost:8088/explore/?slice_id=234&form_data=%7B%22slice_id%22%3A%20234%7D&standalone=true"
+                                    width="100%" height="400" frameborder="0"></iframe>
+                                <h6 class="mt-2">Biểu đồ thống kê điểm project</h6>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 mb-3">
-                <div class="menu-item bg-info rounded shadow">
-                    <a href="#" class="menu-link">
-                        <i class="menu-icon fas fa-ranking-star fa-2x"></i>
-                        <span class="menu-text">Bảng xếp hạng</span>
-                    </a>
+            <div class="card card-success card-outline">
+                <div class="card-header">
+                    <h2 class="card-title text-bold" style="font-size: 24px">Thống kê sinh viên</h2>
                 </div>
-            </div>
-        @endif
-        <div class="col-md-3 mb-3">
-            <div class="menu-item bg-info rounded shadow">
-                <a href="{{ route('member.calendar') }}" class="menu-link">
-                    <i class="menu-icon fas fa-calendar fa-2x"></i>
-                    <span class="menu-text">Lịch học</span>
-                </a>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="membersTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Họ và tên</th>
+                                    <th>Mã sinh viên</th>
+                                    <th>Lớp</th>
+                                    <th>Điểm project</th>
+                                    <th>Số lần phát biểu</th>
+                                    <th>Số lần vắng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($members as $each)
+                                    <tr>
+                                        <td>{{ $each['STT'] }}</td>
+                                        <td>{{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
+                                        <td>{{ $each['Mã sinh viên'] }}</td>
+                                        <td>{{ $each['Lớp'] }}</td>
+                                        <td>
+                                            {{ floor($each['Điểm project']) == $each['Điểm project']
+                                                ? number_format($each['Điểm project'], 0)
+                                                : number_format($each['Điểm project'], 1, '.', '') }}
+                                        </td>
+                                        <td>{{ $each['Vắng'] }}</td>
+                                        <td>{{ $each['Phát biểu'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="menu-item bg-info rounded shadow">
-                <a href="{{ route('member.attendance') }}" class="menu-link">
-                    <i class="menu-icon fas fa-check-to-slot fa-2x"></i>
-                    <span class="menu-text">Điểm danh</span>
-                </a>
-            </div>
-        </div>
-        @if (session('role') == 'admin')
-            <div class="col-md-3 mb-3">
-                <div class="menu-item bg-info rounded shadow">
-                    <a href="{{ route('admin.attendances') }}" class="menu-link">
-                        <i class="menu-icon fas fa-list-check fa-2x"></i>
-                        <span class="menu-text">Tạo phiên điểm danh</span>
-                    </a>
-                </div>
-            </div>
-        @endif
-    </div>
+    </section>
     <!-- /.content -->
 @endsection
+
+@push('js')
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo DataTable
+            var table = $('#membersTable').DataTable({
+                pageLength: 100,
+                scrollY: '400px',
+                scrollCollapse: true,
+                paging: false,
+                searching: true,
+                info: true,
+                autoWidth: false,
+                responsive: true,
+                ordering: false, // Tắt sorting
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json'
+                },
+            });
+
+            // Ghi đè hàm tìm kiếm
+            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                // Giá trị cột "name" và "msv"
+                var name = data[1] || ""; // Lấy dữ liệu từ cột thứ 2 (name)
+                var msv = data[2] || ""; // Lấy dữ liệu từ cột thứ 3 (msv)
+                var searchValue = $('#membersTable_filter input').val() || ""; // Lấy giá trị ô tìm kiếm
+
+                // Kiểm tra xem giá trị tìm kiếm có khớp với name hoặc msv không
+                return (
+                    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").indexOf(
+                        searchValue.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    ) > -1 ||
+                    msv.toLowerCase().indexOf(searchValue.toLowerCase()) > -1
+                );
+            });
+
+            // Gọi lại hàm filter khi nhập giá trị
+            $('#membersTable_filter input').on('keyup', function() {
+                table.draw();
+            });
+
+            $('#sidebar-toggle-button').on('click', function() {
+                setTimeout(() => {
+                    table.columns.adjust().draw(false); // Cập nhật lại table
+                }, 0); // Đợi animation của sidebar kết thúc
+            });
+        });
+    </script>
+@endpush

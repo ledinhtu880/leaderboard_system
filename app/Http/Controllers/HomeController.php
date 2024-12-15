@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Member;
@@ -12,42 +13,40 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view("index");
+        $members = HelperController::getDataFromSuperset();
+        usort($members, function ($a, $b) {
+            return $a['STT'] - $b['STT'];
+        });
+        return view('index', ['members' => $members]);
     }
+    public function leaderboard()
+    {
+        $data = HelperController::getDataFromSuperset();
+        $members = HelperController::rankingStudent($data);
 
-    // - Hàm liên quan đến người dùng
+        $firstPlace = $members[0] ?? null;
+        $secondPlace = $members[1] ?? null;
+        $thirdPlace = $members[2] ?? null;
+        $remainingMembers = array_slice($members, 3);
+
+        return view('leaderboard', [
+            'firstPlace' => $firstPlace,
+            'secondPlace' => $secondPlace,
+            'thirdPlace' => $thirdPlace,
+            'remainingMembers' => $remainingMembers
+        ]);
+    }
     public function memberProfile()
     {
         $user = Auth::user();
         $member = Member::where('user_id', $user->id)->first();
-        return view('member.profile', compact('member'));
-    }
-    public function memberCalendar()
-    {
-        $memberId = auth()->user()->member->id;
-        $lessons = DB::table('lessons AS l')
-            ->join('schedules AS s', 'l.schedule_id', '=', 's.id')
-            ->join('subjects AS sj', 's.subject_id', '=', 'sj.id')
-            ->join('rooms AS r', 's.room_id', '=', 'r.id')
-            ->join('course_registrations AS cr', 'sj.id', '=', 'cr.subject_id')
-            ->join('members AS m', 'cr.member_id', '=', 'm.id')
-            ->where('m.id', $memberId)
-            ->select('sj.subject_name', 'r.name as room_name', 'l.lesson_date', 'l.start_time', 'l.end_time', 'week_index')
-            ->get();
+        $listMark = HelperController::getMarkByStudentId($user->username);
+        $listMark['ranking'] = HelperController::getRankingById($user->username);
 
-        return view('member.calendar', compact('lessons'));
-    }
-    public function memberAttendance()
-    {
-        $currentWeekStart = Carbon::now()->startOfWeek();
-        $currentWeekEnd = Carbon::now()->endOfWeek();
-
-        $nextWeekStart = $currentWeekEnd->copy()->addDay();
-        $nextWeekEnd = $nextWeekStart->copy()->endOfWeek();
-
-        $lessons = Lesson::whereBetween('lesson_date', [$currentWeekStart->toDateString(), $nextWeekEnd->toDateString()])
-            ->with(['schedule', 'schedule.subject', 'schedule.room'])
-            ->get();
-        return view('member.attendance', compact('lessons'));
+        // Convert member to array, merge with listMark, then convert back to object
+        $memberArray = $member->toArray();
+        $mergedData = array_merge($memberArray, $listMark);
+        $member = (object)$mergedData;
+        return view('profile', compact('member'));
     }
 }

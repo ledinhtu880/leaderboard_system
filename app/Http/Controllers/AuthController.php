@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Models\CourseRegistration;
-use App\Models\Subject;
+use App\Models\Member;
 use App\Models\User;
 use Exception;
 
@@ -18,6 +17,7 @@ class AuthController extends Controller
 {
     public function login()
     {
+        // dd(HelperController::getDataFromSheet());
         if (Auth::check()) {
             return redirect()->intended('');
         } else {
@@ -34,42 +34,23 @@ class AuthController extends Controller
         if (!$user) {
             try {
                 DB::beginTransaction();
-                $bearerToken = HelperController::getAccessToken($username, $password);
-                $studentData = HelperController::getStudentData($bearerToken);
-
                 $user = User::create([
                     'username' => $username,
                     'password' => $password
                 ]);
 
-                $birthdate = \DateTime::createFromFormat('d/m/Y', $studentData['student']['birthDateString'])
-                    ->format('Y-m-d');
-
-                $member = $user->member()->create([
-                    'name' => $studentData['student']['displayName'],
-                    'phone' => $studentData['student']['phoneNumber'],
-                    'birthdate' => $birthdate,
-                    'email' => $studentData['student']['user']['email'],
-                    'class' => $studentData['student']['enrollmentClass']['className'],
-                    'gpa' => $studentData['learningMark'],
-                ]);
-
-                // Kiểm tra xem môn học CSE414 đã tồn tại chưa
-                $subject = Subject::where('subject_code', 'CSE414')->exists();
-
-                // Chỉ gọi saveSubjectData nếu môn học chưa tồn tại
-                if ($subject == false) {
-                    HelperController::saveSubjectData($bearerToken);
-                    $subject = Subject::where('subject_code', 'CSE414')->first();
-
-                    Log::info($member);
-                    Log::info($subject);
-                    CourseRegistration::create([
-                        'member_id' => $member->id,
-                        'subject_id' => $subject->id,
-                    ]);
+                $sheetsData = HelperController::getDataFromSheet();
+                if (Member::count() != 59) {
+                    foreach ($sheetsData as $each) {
+                        Member::create([
+                            'name' => $each['Họ'] . ' ' . $each['Tên'],
+                            'msv' => $each["Mã sinh viên"],
+                            'absence_count' => $each['Vắng'],
+                            'raisehand_count' => $each['Phát biểu'],
+                            'class' => $each['Lớp'],
+                        ]);
+                    }
                 }
-
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
@@ -83,6 +64,23 @@ class AuthController extends Controller
 
         if (Hash::check($password, $user->password)) {
             Auth::login($user);
+            $bearerToken = HelperController::getAccessToken($username, $password);
+            $studentData = HelperController::getStudentData($bearerToken);
+            $birthdate = \DateTime::createFromFormat('d/m/Y', $studentData['student']['birthDateString'])
+                ->format('Y-m-d');
+
+            if ($user->member->name == null) {
+                Member::where('msv', $username)->update([
+                    'name' => $studentData['student']['displayName'],
+                    'msv' => $username,
+                    'phone' => $studentData['student']['phoneNumber'],
+                    'birthdate' => $birthdate,
+                    'email' => $studentData['student']['user']['email'],
+                    'class' => $studentData['student']['enrollmentClass']['className'],
+                    'gpa' => $studentData['learningMark'],
+                    'user_id' => $user->id,
+                ]);
+            }
 
             $request->session()->put([
                 'name' => $user->member->name,
@@ -90,7 +88,6 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'firstCharacter' => $user->member->getFirstCharacter,
             ]);
-
             return response()->json([
                 'status' => 'success',
                 'url' => redirect()->intended('')

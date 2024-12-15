@@ -20,5 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('get-lesson-by-subject', [ApiController::class, 'getLessonBySubject']);
-Route::post('store-session', [ApiController::class, 'storeAttendanceSession']);
+Route::get('get-data', [ApiController::class, 'fetchDataFromSuperset']);
