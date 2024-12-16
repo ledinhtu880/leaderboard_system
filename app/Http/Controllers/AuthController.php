@@ -33,17 +33,19 @@ class AuthController extends Controller
 
             $studentClass = $studentData['student']['enrollmentClass']['className'];
             $studentEmail = $studentData['student']['user']['email'];
-            $studentGpa = $studentData['learningMark'];
+            $studentGpa10 = $studentData['learningMark'];
+            $studentGpa4 = $studentData['learningMark4'];
             $studentBirthdate = $studentData['student']['birthDateString'];
 
             $request->session()->put([
                 'auth' => true,
                 'name' => $studentName,
-                'username' => $username,
+                'msv' => $username,
                 'phone' => $studentData['student']['phoneNumber'],
                 'class' => $studentClass,
                 'email' => $studentEmail,
-                'gpa' => $studentGpa,
+                'gpa10' => $studentGpa10,
+                'gpa4' => $studentGpa4,
                 'birthdate' => $studentBirthdate,
                 'firstCharacter' => $firstCharacter,
             ]);

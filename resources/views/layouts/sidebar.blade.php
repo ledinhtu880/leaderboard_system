@@ -11,11 +11,11 @@
         <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
             <div class="image d-flex align-items-center justify-content-center">
                 <span class="user-avatar img-circle elevation-2 text-white">
-                    {{ Auth::check() ? session('firstCharacter') : 'U' }}</span>
+                    {{ session('auth') ? session('firstCharacter') : 'U' }}</span>
             </div>
             <div class="info">
                 <a href="#" class="d-flex flex-column">
-                    {{ Auth::check() ? session('name') : 'Người dùng' }}
+                    {{ session('auth') ? session('name') : 'Người dùng' }}
                 </a>
             </div>
             {{-- <div class="nav nav-pills nav-sidebar flex-column">
@@ -32,13 +32,6 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
-                <li class="nav-item">
-                    <a href="{{ route('leaderboard') }}"
-                        class="nav-link{{ request()->is('/statistics') ? ' active' : '' }}">
-                        <i class="nav-icon fas fa-ranking-star"></i>
-                        <p>Bảng xếp hạng</p>
-                    </a>
-                </li>
                 @if (session()->has('auth'))
                     <li class="nav-item">
                         <a href="{{ route('statistics') }}"
@@ -47,6 +40,14 @@
                             <p>Thống kê</p>
                         </a>
                     </li>
+                @endif
+                <li class="nav-item">
+                    <a href="{{ route('leaderboard') }}" class="nav-link{{ request()->is('/') ? ' active' : '' }}">
+                        <i class="nav-icon fas fa-ranking-star"></i>
+                        <p>Bảng xếp hạng</p>
+                    </a>
+                </li>
+                @if (session()->has('auth'))
                     <li class="nav-item">
                         <a href="{{ route('profile') }}"
                             class="nav-link{{ Str::startsWith(request()->url(), url('/profile')) ? ' active' : '' }}">

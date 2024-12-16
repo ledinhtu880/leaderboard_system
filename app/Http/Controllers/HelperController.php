@@ -63,30 +63,6 @@ class HelperController extends Controller
 
         return $filteredData;
     }
-    /* public static function rankingStudent($data): array
-    {
-        usort($data, function ($a, $b) {
-            if ($a['Điểm tổng'] != $b['Điểm tổng']) {
-                return $b['Điểm tổng'] <=> $a['Điểm tổng'];
-            }
-            if ($a['Điểm chuyên cần'] != $b['Điểm chuyên cần']) {
-                return $b['Điểm chuyên cần'] <=> $a['Điểm chuyên cần'];
-            }
-            if ($a['Điểm phát biểu'] != $b['Điểm phát biểu']) {
-                return $b['Điểm phát biểu'] <=> $a['Điểm phát biểu'];
-            }
-            if ($a['Tên'] != $b['Tên']) {
-                return strcmp($a['Tên'], $b['Tên']);
-            }
-            return strcmp($a['Họ'], $b['Họ']);
-        });
-
-        $data = array_map(function ($index, $member) {
-            $member['ranking'] = $index + 1;
-            return $member;
-        }, array_keys($data), $data);
-        return $data;
-    } */
     public static function rankingStudent($data): array
     {
         usort($data, function ($a, $b) {

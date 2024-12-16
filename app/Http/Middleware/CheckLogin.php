@@ -16,7 +16,7 @@ class CheckLogin
     public function handle(Request $request, Closure $next): Response
     {
         if (!session('name')) {
-            return redirect()->route('login')->with('type', 'danger')->with('message', 'Bạn cần phải đăng nhập!');
+            return redirect()->route('leaderboard')->with('type', 'danger')->with('message', 'Bạn cần phải đăng nhập!');
         }
         return $next($request);
     }

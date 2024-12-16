@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Trang chủ')
+@section('title', 'Thông tin cá nhân')
 
 @push('css')
     <style>
@@ -60,12 +60,6 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">Xem thông tin</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('leaderboard') }}">Bảng xếp hạng</a></li>
-                        <li class="breadcrumb-item active">Xem thông tin</li>
-                    </ol>
                 </div>
             </div>
         </div>
@@ -144,7 +138,7 @@
                                                 <b>{{ $member->{"Phát biểu"} }}</b>/5
                                             </div>
                                         </div>
-                                        <p class="mt-2">Số lần xung phong</p>
+                                        <p class="mt-2">Số lần phát biểu</p>
                                     </div>
                                 </div>
                             </div>
@@ -185,21 +179,29 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2"></div>
                                 <div class="col-md-4">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-lightblue"><i
-                                                class="fas fa-graduation-cap"></i></span>
+                                        <span class="info-box-icon bg-lightblue"><i class="fas fa-user-graduate"></i></span>
                                         <div class="info-box-content">
-                                            <span class="info-box-text">GPA (Hệ 10)</span>
+                                            <span class="info-box-text">GPA (Hệ 4) </span>
                                             <span class="info-box-number"
-                                                style="font-size: 18px;">{{ $member->{"gpa"} }}</span>
+                                                style="font-size: 18px;">{{ $member->{"gpa4"} }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-primary"><i class="fas fa-medal"></i></span>
+                                        <span class="info-box-icon bg-primary"><i class="fas fa-graduation-cap"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">GPA (Hệ 10)</span>
+                                            <span class="info-box-number"
+                                                style="font-size: 18px;">{{ $member->{"gpa10"} }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-gradient-cyan"><i class="fas fa-medal"></i></span>
                                         <div class="info-box-content">
                                             <span class="info-box-text">Ranking</span>
                                             <span class="info-box-number"

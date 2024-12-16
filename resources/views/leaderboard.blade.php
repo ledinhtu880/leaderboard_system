@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Trang chủ')
+@section('title', 'Bảng xếp hạng')
 
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
@@ -15,6 +15,57 @@
         .form-control.is-invalid {
             border-color: #dc3545;
             background-image: none;
+        }
+
+        .r-1 {
+            color: rgb(181, 138, 27);
+            font-weight: 700;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, rgb(255, 247, 224) 0%, rgb(255, 215, 0) 100%);
+            border: 1px solid rgba(212, 160, 23, 0.35);
+            border-radius: 50%;
+            font-size: 1rem;
+            line-height: 1;
+            box-shadow: rgba(212, 160, 23, 0.8) 1px 1px 0px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .r-2 {
+            color: rgb(102, 115, 128);
+            font-weight: 700;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, rgb(255, 255, 255) 0%, rgb(216, 227, 237) 100%);
+            border: 1px solid rgba(124, 139, 153, 0.35);
+            border-radius: 50%;
+            font-size: 1rem;
+            line-height: 1;
+            box-shadow: rgba(124, 139, 153, 0.8) 1px 1px 0px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .r-3 {
+            color: rgb(184, 92, 47);
+            font-weight: 700;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, rgb(253, 240, 233) 0%, rgb(255, 188, 140) 100%);
+            border: 1px solid rgba(204, 108, 61, 0.35);
+            border-radius: 50%;
+            font-size: 1rem;
+            line-height: 1;
+            box-shadow: rgba(204, 108, 61, 0.8) 1px 1px 0px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 @endpush
@@ -210,15 +261,76 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($members as $each)
-                                            <tr>
-                                                <td class="text-center text-bold">{{ $each['ranking'] }}</td>
-                                                <td>{{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
-                                                <td>{{ $each['Mã sinh viên'] }}</td>
-                                                <td>{{ $each['Lớp'] }}</td>
-                                                <td>{{ $each['Điểm chuyên cần'] }}</td>
-                                                <td>{{ $each['Điểm phát biểu'] }}</td>
-                                                <td>{{ $each['Điểm tổng'] }}</td>
-                                            </tr>
+                                            @if ($each['ranking'] == 1)
+                                                <tr>
+                                                    <td style="background-color: #FCFFC1 !important;"
+                                                        class="d-flex align-items-center justify-content-center">
+                                                        <span class="r-1">{{ $each['ranking'] }}</span>
+                                                    </td>
+                                                    <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
+                                                    <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Mã sinh viên'] }}</td>
+                                                    <td style="background-color: #FCFFC1 !important;">{{ $each['Lớp'] }}
+                                                    </td>
+                                                    <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Điểm chuyên cần'] }}</td>
+                                                    <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Điểm phát biểu'] }}</td>
+                                                    <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Điểm tổng'] }}</td>
+                                                </tr>
+                                            @elseif($each['ranking'] == 2)
+                                                <tr>
+                                                    <td style="background-color: #F2F9FF !important;"
+                                                        class="d-flex align-items-center justify-content-center">
+                                                        <span class="r-2">{{ $each['ranking'] }}</span>
+                                                    </td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Mã sinh viên'] }}</td>
+                                                    <td style="background-color: #F2F9FF !important;">{{ $each['Lớp'] }}
+                                                    </td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Điểm chuyên cần'] }}</td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Điểm phát biểu'] }}</td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Điểm tổng'] }}</td>
+                                                </tr>
+                                            @elseif($each['ranking'] == 3)
+                                                <tr>
+                                                    <td
+                                                        style="background-color: #FFF0DC !important;"class="d-flex align-items-center justify-content-center">
+                                                        <span class="r-3">{{ $each['ranking'] }}</span>
+                                                    </td>
+                                                    <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
+                                                    <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Mã sinh viên'] }}</td>
+                                                    <td style="background-color: #FFF0DC !important;">{{ $each['Lớp'] }}
+                                                    </td>
+                                                    <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Điểm chuyên cần'] }}</td>
+                                                    <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Điểm phát biểu'] }}</td>
+                                                    <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Điểm tổng'] }}</td>
+                                                </tr>
+                                            @else
+                                                <tr>
+                                                    <td class="d-flex align-items-center justify-content-center">
+                                                        <span>{{ $each['ranking'] }}</span>
+                                                    </td>
+                                                    <td>{{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
+                                                    <td>{{ $each['Mã sinh viên'] }}</td>
+                                                    <td>{{ $each['Lớp'] }}</td>
+                                                    <td>{{ $each['Điểm chuyên cần'] }}</td>
+                                                    <td>{{ $each['Điểm phát biểu'] }}</td>
+                                                    <td>{{ $each['Điểm tổng'] }}</td>
+                                                </tr>
+                                            @endif
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -240,7 +352,7 @@
             // Khởi tạo DataTable
             var table = $('#membersTable').DataTable({
                 pageLength: 100,
-                scrollY: '400px',
+                scrollY: '700px',
                 scrollCollapse: true,
                 paging: false,
                 searching: true,
