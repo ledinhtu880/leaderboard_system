@@ -21,7 +21,7 @@ class HomeController extends Controller
     {
         $data = HelperController::getDataFromSuperset();
         $members = HelperController::rankingStudent($data);
-
+        
         $firstPlace = $members[0] ?? null;
         $secondPlace = $members[1] ?? null;
         $thirdPlace = $members[2] ?? null;

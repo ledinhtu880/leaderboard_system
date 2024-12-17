@@ -21,7 +21,7 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('', [HomeController::class, 'leaderboard'])->name('leaderboard');
 Route::middleware('checkLogin')->group(function () {
-    // User Route
     Route::get('statistics', [HomeController::class, 'statistics'])->name('statistics');
     Route::get('profile', [HomeController::class, 'memberProfile'])->name('profile');
+    // User Route
 });

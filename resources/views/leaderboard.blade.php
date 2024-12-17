@@ -254,6 +254,7 @@
                                             <th scope="col">Họ và tên</th>
                                             <th scope="col">Mã sinh viên</th>
                                             <th scope="col">Lớp</th>
+                                            <th scope="col">Điểm project</th>
                                             <th scope="col">Điểm chuyên cần</th>
                                             <th scope="col">Điểm phát biểu</th>
                                             <th scope="col">Điểm tổng</th>
@@ -274,6 +275,8 @@
                                                     <td style="background-color: #FCFFC1 !important;">{{ $each['Lớp'] }}
                                                     </td>
                                                     <td style="background-color: #FCFFC1 !important;">
+                                                        {{ $each['Điểm project'] }}</td>
+                                                    <td style="background-color: #FCFFC1 !important;">
                                                         {{ $each['Điểm chuyên cần'] }}</td>
                                                     <td style="background-color: #FCFFC1 !important;">
                                                         {{ $each['Điểm phát biểu'] }}</td>
@@ -292,6 +295,8 @@
                                                         {{ $each['Mã sinh viên'] }}</td>
                                                     <td style="background-color: #F2F9FF !important;">{{ $each['Lớp'] }}
                                                     </td>
+                                                    <td style="background-color: #F2F9FF !important;">
+                                                        {{ $each['Điểm project'] }}</td>
                                                     <td style="background-color: #F2F9FF !important;">
                                                         {{ $each['Điểm chuyên cần'] }}</td>
                                                     <td style="background-color: #F2F9FF !important;">
@@ -312,6 +317,8 @@
                                                     <td style="background-color: #FFF0DC !important;">{{ $each['Lớp'] }}
                                                     </td>
                                                     <td style="background-color: #FFF0DC !important;">
+                                                        {{ $each['Điểm project'] }}</td>
+                                                    <td style="background-color: #FFF0DC !important;">
                                                         {{ $each['Điểm chuyên cần'] }}</td>
                                                     <td style="background-color: #FFF0DC !important;">
                                                         {{ $each['Điểm phát biểu'] }}</td>
@@ -326,6 +333,7 @@
                                                     <td>{{ $each['Họ'] . ' ' . $each['Tên'] }}</td>
                                                     <td>{{ $each['Mã sinh viên'] }}</td>
                                                     <td>{{ $each['Lớp'] }}</td>
+                                                    <td>{{ $each['Điểm project'] }}</td>
                                                     <td>{{ $each['Điểm chuyên cần'] }}</td>
                                                     <td>{{ $each['Điểm phát biểu'] }}</td>
                                                     <td>{{ $each['Điểm tổng'] }}</td>
