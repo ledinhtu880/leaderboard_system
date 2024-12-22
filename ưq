@@ -1,0 +1,22 @@
+feat: group leaderboard
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sun Dec 22 22:08:43 2024 +0700
+#
+# On branch main
+# Your branch is ahead of 'origin/main' by 3 commits.
+#   (use "git push" to publish your local commits)
+#
+# Changes to be committed:
+#	modified:   app/Http/Controllers/HelperController.php
+#	modified:   app/Http/Controllers/HomeController.php
+#	modified:   resources/views/layouts/sidebar.blade.php
+#	new file:   resources/views/leaderboardGroup.blade.php
+#	modified:   routes/web.php
+#
+# Changes not staged for commit:
+#	modified:   resources/views/layouts/sidebar.blade.php
+#	modified:   resources/views/leaderboardGroup.blade.php
+#

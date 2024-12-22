@@ -20,6 +20,7 @@ Route::post('checkLogin', [AuthController::class, 'checkLogin'])->name('checkLog
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('', [HomeController::class, 'leaderboard'])->name('leaderboard');
+Route::get('leaderboard/groups', [HomeController::class, 'leaderboardGroup'])->name('leaderboard.group');
 Route::middleware('checkLogin')->group(function () {
     Route::get('statistics', [HomeController::class, 'statistics'])->name('statistics');
     Route::get('profile', [HomeController::class, 'memberProfile'])->name('profile');

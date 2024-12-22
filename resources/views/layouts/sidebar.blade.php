@@ -18,14 +18,6 @@
                     {{ session('auth') ? session('name') : 'Người dùng' }}
                 </a>
             </div>
-            {{-- <div class="nav nav-pills nav-sidebar flex-column">
-                <li class="nav-item">
-                    <a href="{{ route('leaderboard') }}" class="nav-link">
-                        <i class="nav-icon fas fa-right-to-bracket"></i>
-                        <p>Đăng nhập</p>
-                    </a>
-                </li>
-            </div> --}}
         </div>
 
         <!-- Sidebar Menu -->
@@ -45,6 +37,13 @@
                     <a href="{{ route('leaderboard') }}" class="nav-link{{ request()->is('/') ? ' active' : '' }}">
                         <i class="nav-icon fas fa-ranking-star"></i>
                         <p>Bảng xếp hạng</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('leaderboard.group') }}"
+                        class="nav-link{{ Str::startsWith(request()->url(), url('/leaderboard/groups')) ? ' active' : '' }}">
+                        <i class="nav-icon fas fa-people-roof"></i>
+                        <p>Bảng xếp hạng nhóm</p>
                     </a>
                 </li>
                 @if (session()->has('auth'))

@@ -27,6 +27,11 @@ class HomeController extends Controller
             'members' => $members
         ]);
     }
+    public function leaderboardGroup()
+    {
+        $data = HelperController::getGroups();
+        return view('leaderboardGroup', ['data' => $data]);
+    }
     public function memberProfile()
     {
         // HelperController::forceRefreshChart();

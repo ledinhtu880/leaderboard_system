@@ -48,6 +48,56 @@ class HelperController extends Controller
 
         return $data["result"][0]["data"];
     }
+    public static function getGroups(): array
+    {
+        $data = HelperController::getDataFromSuperset();
+        $groups = [];
+
+        // Group mapping helper function
+        $formatGroupName = function ($groupCode) {
+            if (preg_match('/C(\d)N(\d)/', $groupCode, $matches)) {
+                return "Cụm {$matches[1]} - Nhóm {$matches[2]}";
+            }
+            return $groupCode;
+        };
+
+        // Group students and calculate scores
+        foreach ($data as $member) {
+            $groupCode = $member['Nhóm'];
+            if (!isset($groups[$groupCode])) {
+                $groups[$groupCode] = [
+                    'name' => $formatGroupName($groupCode),
+                    'members' => [],
+                    'totalScore' => 0,
+                    'memberCount' => 0,
+                    'averageScore' => 0
+                ];
+            }
+            $groups[$groupCode]['members'][] = $member;
+            $groups[$groupCode]['totalScore'] += $member['Điểm tổng'];
+            $groups[$groupCode]['memberCount']++;
+        }
+
+        // Calculate average scores
+        foreach ($groups as &$group) {
+            $group['averageScore'] = $group['memberCount'] > 0
+                ? round($group['totalScore'] / $group['memberCount'], 2)
+                : 0;
+        }
+
+        // Sort groups by average score descending
+        uasort($groups, function ($a, $b) {
+            return $b['averageScore'] <=> $a['averageScore'];
+        });
+
+        // Add rankings
+        $rank = 1;
+        foreach ($groups as &$group) {
+            $group['ranking'] = $rank++;
+        }
+
+        return $groups;
+    }
     public static function rankingStudent($data): array
     {
         // First, sort by scores
