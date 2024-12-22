@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
     public function statistics()
     {
+        // HelperController::forceRefreshChart();
         $data = HelperController::getDataFromSuperset();
         $members = HelperController::rankingStudent($data);
         usort($members, function ($a, $b) {
@@ -19,23 +19,17 @@ class HomeController extends Controller
     }
     public function leaderboard()
     {
+        // HelperController::forceRefreshChart();
         $data = HelperController::getDataFromSuperset();
         $members = HelperController::rankingStudent($data);
-        
-        $firstPlace = $members[0] ?? null;
-        $secondPlace = $members[1] ?? null;
-        $thirdPlace = $members[2] ?? null;
-        // $remainingMembers = array_slice($members, 3);
 
         return view('leaderboard', [
-            'firstPlace' => $firstPlace,
-            'secondPlace' => $secondPlace,
-            'thirdPlace' => $thirdPlace,
             'members' => $members
         ]);
     }
     public function memberProfile()
     {
+        // HelperController::forceRefreshChart();
         $member = [
             'msv' => Session::get('username'),
             'name' => Session::get('name'),

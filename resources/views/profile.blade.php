@@ -103,8 +103,13 @@
                 </div>
                 <div class="col-md-9">
                     <!-- Card -->
-                    <div class="card card-info card-outline">
-                        <!-- Card body -->
+                    <div class="card card-success card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title text-success text-bold">
+                                <i class="fas fa-chart-pie mr-2"></i>
+                                Thống kê tham gia môn học
+                            </h3>
+                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
@@ -143,13 +148,17 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- /.card-body -->
                     </div>
                     <!-- /.card -->
 
                     <!-- Card -->
-                    <div class="card card-info card-outline">
-                        <!-- Card body -->
+                    <div class="card card-olive card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title text-olive text-bold">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Kết quả học tập
+                            </h3>
+                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4">
@@ -211,7 +220,37 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+
+                    <!-- Card -->
+                    <div class="card card-teal card-outline m-0">
+                        <div class="card-header">
+                            <h3 class="card-title text-teal text-bold">
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                                Nhắc nhở
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            @if ($member->{'Phát biểu'} < 5)
+                                <div class="alert alert-info">
+                                    <i class="fas fa-comment mr-2"></i>
+                                    Bạn cần phát biểu thêm {{ 5 - $member->{"Phát biểu"} }} lần để đạt điểm tối đa.
+                                </div>
+                            @endif
+                            @if ($member->{'Vắng'} >= 2)
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Bạn đã vắng {{ $member->{"Vắng"} }} buổi. Vắng quá 3 buổi sẽ bị cấm thi!
+                                </div>
+                            @endif
+                            @if ($member->{'Điểm tổng'} < 6)
+                                <div class="alert alert-secondary">
+                                    <i class="fas fa-solid fa-circle-exclamation mr-2"></i>
+                                    Hiện điểm tổng của bạn < 6. Hãy chăm chỉ học, lấy điểm phát biểu và đi học đầy đủ để cải
+                                        thiện điểm nhé </div>
+                            @endif
+                        </div>
                     </div>
                     <!-- /.card -->
                 </div>
